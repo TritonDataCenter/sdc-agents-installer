@@ -54,7 +54,7 @@ build atropos
 build provisioner
 build gzone_heartbeat heartbeater
 build dataset_manager
-build zonetracker
+#build zonetracker
 build cloud-analytics "" master pkg "build/pkg/*.tar.gz" ""
 
 exit 0

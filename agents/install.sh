@@ -51,19 +51,6 @@ for tarball in $AGENTS; do
 
         provisioner.tgz)
             npm-install "./$tarball"
-            if is-coal; then
-                if [[ -f $AGENTS_DIR/etc/provisioner.ini ]]; then
-                    sed -e "s/^max_concurrent_provisions.*$/max_concurrent_provisions = 1/" \
-                        -e "s/^external_link.*$/external_link = e1000g0/" \
-                        -e "s/^internal_link.*$/internal_link = e1000g0/" \
-                        -e "s/^login.*$/login = ${amqp_user}/" \
-                        -e "s/^password.*$/password = ${amqp_pass}/" \
-                      $AGENTS_DIR/etc/provisioner.ini > $AGENTS_DIR/etc/provisioner.ini.new \
-                      && cp $AGENTS_DIR/etc/provisioner.ini.new $AGENTS_DIR/etc/provisioner.ini \
-                      && rm -f $AGENTS_DIR/etc/provisioner.ini.new
-                    echo "host = ${amqp_host}" >> $AGENTS_DIR/etc/provisioner.ini
-                fi
-            fi
             ;;
 
         heartbeater.tgz)
