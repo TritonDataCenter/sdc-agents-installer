@@ -1,0 +1,12 @@
+#!/bin/bash
+set -x
+set -e
+
+export PATH=/opt/local/bin:$PATH
+rm -fr atropos
+git clone git@git.joyent.com:atropos.git
+cd atropos
+git checkout origin/develop
+cd scriptifier
+time ./build_scripts
+cp agents-*.sh ../..

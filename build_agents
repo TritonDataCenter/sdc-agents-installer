@@ -1,0 +1,60 @@
+#!/bin/bash
+
+# Git clone and build each of the agents. Depends on passwordless access to the
+# Joyent repos.
+
+set -e
+set -x
+
+export CC=gcc
+
+DIRNAME=`dirname $0`
+ROOT=`cd $DIRNAME && pwd`
+DEFAULT_BRANCH=develop
+
+build() {
+    REPO=$1
+    NAME=$2
+    BRANCH=$3
+    TARGET=$4
+    TARBALL=$5
+    OUTPUT=$6
+
+    if [ -z "$NAME" ]; then
+        NAME=$1
+    fi
+
+    if [ -z "$BRANCH" ]; then
+        BRANCH=$DEFAULT_BRANCH
+    fi
+
+    if [ -z "$TARGET" ]; then
+        TARGET=npm
+    fi
+
+    if [ -z "$TARBALL" ]; then
+        TARBALL=$NAME.tgz
+    fi
+
+    if [ ! -d "$REPO" ]; then
+    	git clone git@git.joyent.com:$REPO.git
+    fi
+
+    
+    (cd $REPO && git fetch && git checkout origin/$BRANCH)
+    (cd $REPO && git submodule update --init)
+    
+    (cd $REPO && gmake $TARGET)
+    cp $REPO/$TARBALL agents/$OUTPUT
+}
+
+# We can build these agents more or less the same way
+
+build atropos
+build provisioner
+build gzone_heartbeat heartbeater
+build dataset_manager
+build zonetracker
+build cloud-analytics "" master pkg "build/pkg/*.tar.gz" ""
+
+exit 0

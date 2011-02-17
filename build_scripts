@@ -1,0 +1,37 @@
+#!/usr/bin/bash
+
+BUILDSTAMP=`TZ=UTC date "+%Y%m%dT%H%M%SZ"`; export BUILDSTAMP 
+FILENAME=agents-${BUILDSTAMP}.sh
+MD5_FILE=agents-${BUILDSTAMP}.md5sum
+TMP=/var/tmp
+
+set -e
+
+./build_agents
+
+(cat <<__EOF__
+#!/bin/sh
+if [ \`pwd\` != '$TMP' ]; then
+  cd $TMP
+fi
+__EOF__
+)> $FILENAME
+
+(./shar -D -n "Joyent" agents | grep -v '^exit 0'; cat <<EOF
+
+if [[ -f agents/install.sh ]]; then
+    (cd agents && /usr/bin/bash ./install.sh)
+fi
+
+# Delete agents directory.
+rm -fr agents
+
+exit 0
+EOF
+)>> $FILENAME
+
+md5sum $FILENAME | cut -d' ' -f 1 > $MD5_FILE
+
+if [ ! -z "$COAL_PUBLISH" ]; then
+    scp $MD5_FILE $FILENAME jill@coal.joyent.us:/data/coal/live_147/ur-scripts/
+fi

@@ -1,0 +1,23 @@
+Building the agents-<buildstamp>.sh script
+==========================================
+
+NOTE: This must be run on a 147 build machine such as bh1-build or bh1-autobuild.
+For details on how to setup such an environment see here:
+
+ https://hub.joyent.com/wiki/display/dev/joyent_147
+
+# build the atropos.tgz and provisioner.tgz files (using: CC=gcc gmake all npm)
+* copy the atropos.tgz and provisioner.tgz files into the agents/ directory
+* run ./build_scripts from this directory
+
+
+What this does
+==============
+
+This creates a shar script which is a self contained script that includes
+everything from the agents directory and a small script to unpack this directory
+and run the install.sh script within.
+
+The resulting agents-<buildstamp>.sh script can then be run on a GZ that needs
+the provisioner run (could also be sent through ur-agent).
+
