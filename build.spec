@@ -1,5 +1,5 @@
 {
-    "release-name": "master"
+    "release-name": "develop"
   , "agents": [
       {"repo": "atropos", "checkout": "origin/develop"}
     , {"repo": "provisioner", "checkout": "origin/develop"}
