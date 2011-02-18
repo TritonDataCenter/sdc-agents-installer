@@ -10,12 +10,13 @@ export CC=gcc
 
 DIRNAME=`dirname $0`
 ROOT=`cd $DIRNAME && pwd`
-DEFAULT_BRANCH=develop
+DEFAULT_CHECKOUT="origin/develop"
+
 
 build() {
     REPO=$1
     NAME=$2
-    BRANCH=$3
+    CHECKOUT=$3
     TARGET=$4
     TARBALL=$5
     OUTPUT=$6
@@ -24,8 +25,8 @@ build() {
         NAME=$1
     fi
 
-    if [ -z "$BRANCH" ]; then
-        BRANCH=$DEFAULT_BRANCH
+    if [ -z "$CHECKOUT" ]; then
+        CHECKOUT=$DEFAULT_CHECKOUT
     fi
 
     if [ -z "$TARGET" ]; then
@@ -41,20 +42,37 @@ build() {
     fi
 
     
-    (cd $REPO && git fetch && git checkout origin/$BRANCH)
+    (cd $REPO && git fetch && git checkout $CHECKOUT)
     (cd $REPO && git submodule update --init)
     
     (cd $REPO && gmake $TARGET)
     cp $REPO/$TARBALL agents/$OUTPUT
 }
 
-# We can build these agents more or less the same way
+num_agents=$(${ROOT}/json agents.length < ${ROOT}/build.spec)
+if [[ -n ${num_agents} ]] && [[ ${num_agents} -lt 1 ]]; then
+    echo "FATAL: no agents listed in ${ROOT}/build.spec"
+    exit 1
+fi
 
-build atropos
-build provisioner
-build gzone_heartbeat heartbeater
-build dataset_manager
-#build zonetracker
-build cloud-analytics "" master pkg "build/pkg/*.tar.gz" ""
+idx=0
+while [[ ${idx} -lt ${num_agents} ]]; do
+    repo=$(${ROOT}/json agents[${idx}].repo < ${ROOT}/build.spec)
+    name=$(${ROOT}/json agents[${idx}].name < ${ROOT}/build.spec)
+    checkout=$(${ROOT}/json agents[${idx}].checkout < ${ROOT}/build.spec)
+    target=$(${ROOT}/json agents[${idx}].target < ${ROOT}/build.spec)
+    tarball=$(${ROOT}/json agents[${idx}].tarball < ${ROOT}/build.spec)
+    output=$(${ROOT}/json agents[${idx}].output < ${ROOT}/build.spec)
+
+    if [[ -z ${repo} ]]; then
+        data=$(${ROOT}/json agents[${idx}] < ${ROOT}/build.spec)
+        echo "FATAL: could not include agent '${data}': no repo defined"
+        exit 1
+    fi
+
+    build "${repo}" "${name}" "${checkout}" "${target}" "${tarball}" "${output}"
+
+    ((idx++))
+done
 
 exit 0
