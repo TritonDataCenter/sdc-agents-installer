@@ -7,5 +7,6 @@
       , {"repo": "dataset_manager", "checkout": "origin/develop"}
       , {"repo": "cloud-analytics", "checkout": "master", "target": "pkg", "tarball": "build/pkg/*.tar.gz", "output": ""}
       , {"repo": "zonetracker", "checkout": "origin/develop"}
+      , {"repo": "smart-login", "checkout": "origin/develop"}
       ]
 }
