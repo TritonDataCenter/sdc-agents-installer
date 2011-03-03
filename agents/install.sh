@@ -8,7 +8,8 @@ AGENTS="atropos.tgz
         heartbeater.tgz
         cabase.tar.gz
         cainstsvc.tar.gz
-        dataset_manager.tgz"
+        dataset_manager.tgz
+        zonetracker.tgz"
 AGENTS_DIR=/opt/smartdc/agents
 
 # Check if we're in a COAL environment.
