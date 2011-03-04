@@ -9,6 +9,7 @@ AGENTS="atropos.tgz
         cabase.tar.gz
         cainstsvc.tar.gz
         dataset_manager.tgz
+        smart-login.tgz
         zonetracker.tgz"
 AGENTS_DIR=/opt/smartdc/agents
 
