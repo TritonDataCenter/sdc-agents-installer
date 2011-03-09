@@ -13,14 +13,6 @@ AGENTS="atropos.tgz
         zonetracker.tgz"
 AGENTS_DIR=/opt/smartdc/agents
 
-# Check if we're in a COAL environment.
-is-coal() {
-    if [ "$COAL" != "0" -a "$COAL" != "false" ]; then
-        return 0
-    else
-        return 1
-    fi
-}
 
 npm-install() {
   WHAT=$1
@@ -28,22 +20,9 @@ npm-install() {
       $AGENTS_DIR/bin/agents-npm --no-registry install "$WHAT"
 }
 
-if is-coal; then
-    rabbitmq=$(grep '^rabbitmq=' /etc/headnode.config 2>/dev/null || bootparams | grep '^rabbitmq=' | cut -d'=' -f2-)
-    amqp_user=$(echo ${rabbitmq} | cut -d':' -f1 | cut -d'=' -f2)
-    amqp_pass=$(echo ${rabbitmq} | cut -d':' -f2)
-    amqp_host=$(echo ${rabbitmq} | cut -d':' -f3)
-fi
-
 # Install the actual atropos agent
 tar -zxvf atropos.tgz
 (cd atropos && ./bootstrap.sh "$AGENTS_DIR")
-
-if is-coal; then
-    if [[ -f $AGENTS_DIR/etc/atropos.ini ]]; then
-        echo "host = ${amqp_host}" >> $AGENTS_DIR/etc/atropos.ini
-    fi
-fi
 
 # Install other agents, as if we were some npm-crazed honey badger.
 
@@ -58,11 +37,6 @@ for tarball in $AGENTS; do
 
         heartbeater.tgz)
             npm-install "./$tarball"
-            if is-coal; then
-                if [[ -f $AGENTS_DIR/etc/heartbeater.ini ]]; then
-                    echo "host = ${amqp_host}" >> $AGENTS_DIR/etc/heartbeater.ini
-                fi
-            fi
             ;;
 
         *)
