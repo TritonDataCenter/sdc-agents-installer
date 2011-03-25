@@ -1,12 +1,12 @@
 {
-    "release-name": "develop"
+    "release-name": "release-20110324"
   , "agents":
-      [ {"repo": "atropos", "checkout": "origin/develop"}
-      , {"repo": "provisioner", "checkout": "origin/develop"}
-      , {"repo": "gzone_heartbeat", "name": "heartbeater", "checkout": "origin/develop"}
-      , {"repo": "dataset_manager", "checkout": "origin/develop"}
-      , {"repo": "cloud-analytics", "checkout": "master", "target": "pkg", "tarball": "build/pkg/*.tar.gz", "output": ""}
-      , {"repo": "zonetracker", "checkout": "origin/develop"}
-      , {"repo": "smart-login", "checkout": "origin/develop"}
+      [ {"repo": "atropos", "checkout": "origin/release-20110324"}
+      , {"repo": "provisioner", "checkout": "origin/release-20110324"}
+      , {"repo": "gzone_heartbeat", "name": "heartbeater", "checkout": "origin/release-20110324"}
+      , {"repo": "dataset_manager", "checkout": "origin/release-20110324"}
+      , {"repo": "cloud-analytics", "checkout": "20110324", "target": "pkg", "tarball": "build/pkg/*.tar.gz", "output": ""}
+      , {"repo": "zonetracker", "checkout": "origin/release-20110324"}
+      , {"repo": "smart-login", "checkout": "origin/release-20110324"}
       ]
 }
