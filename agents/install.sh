@@ -13,11 +13,11 @@ AGENTS="atropos.tgz
         zonetracker.tgz"
 AGENTS_DIR=/opt/smartdc/agents
 
-export PATH=$AGENTS_DIR/modules/.npm/atropos/active/package/local/bin:$PATH
 
 npm-install() {
-  $AGENTS_DIR/bin/agents-npm --no-registry install "$WHAT"
-  $AGENTS_DIR/bin/agents-npm publish "$WHAT"
+  WHAT=$1
+  PATH=$AGENTS_DIR/modules/.npm/atropos/active/package/local/bin:$PATH \
+      $AGENTS_DIR/bin/agents-npm --no-registry install "$WHAT"
 }
 
 # Install the actual atropos agent
