@@ -17,7 +17,7 @@ export PATH=$AGENTS_DIR/modules/.npm/atropos/active/package/local/bin:$PATH
 
 npm-install() {
   $AGENTS_DIR/bin/agents-npm --no-registry install "$WHAT"
-  $AGENTS_DIR/bin/agents-npm --no-registry publish "$WHAT"
+  $AGENTS_DIR/bin/agents-npm publish "$WHAT"
 }
 
 # Install the actual atropos agent
