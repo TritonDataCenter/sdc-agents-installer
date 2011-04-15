@@ -25,17 +25,21 @@ npm-install() {
     fi
 }
 
-# Install the actual atropos agent
-tar -zxvf atropos-*.tgz
-(cd atropos && ./bootstrap.sh "$AGENTS_DIR")
+if [ ! -f $AGENTS_DIR/bin/agents-npm ] || $AGENTS_DIR/bin/agents-npm ls atropos | grep 'installed'; then
+  # Install the actual atropos agent
+  tar -zxvf atropos-*.tgz
+  (cd atropos && ./bootstrap.sh "$AGENTS_DIR")
+fi
 
 # Install other agents, as if we were some npm-crazed honey badger.
 
 for tarball in $AGENTS; do
+  if $AGENTS_DIR/bin/agents-npm ls `echo $tarball | cut -f1 -d '.'` | grep 'installed'; then
+    continue
+  fi
     case "$tarball" in
         atropos-*.tgz)
             ;;
-
         *)
             npm-install "./$tarball"
             ;;
