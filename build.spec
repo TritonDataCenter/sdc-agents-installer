@@ -1,12 +1,14 @@
 {
     "release-name": "develop"
-  , "agents":
-      [ {"repo": "atropos", "checkout": "origin/develop"}
-      , {"repo": "provisioner", "checkout": "origin/develop"}
-      , {"repo": "gzone_heartbeat", "name": "heartbeater", "checkout": "origin/develop"}
-      , {"repo": "dataset_manager", "checkout": "origin/develop"}
-      , {"repo": "cloud-analytics", "checkout": "master", "target": "pkg", "tarball": "build/pkg/*.tar.gz", "output": ""}
-      , {"repo": "zonetracker", "checkout": "origin/develop"}
-      , {"repo": "smart-login", "checkout": "origin/develop"}
+  , "packages-url": "https://guest:GrojhykMid@216.57.203.66:444/coal/live_147/agents"
+  , "packages":
+      [ {"name": "atropos",         "branch": "develop" }
+      , {"name": "provisioner",     "branch": "develop" }
+      , {"name": "heartbeater",     "branch": "develop" }
+      , {"name": "dataset_manager", "branch": "develop" }
+      , {"name": "zonetracker",     "branch": "develop" }
+      , {"name": "smartlogin",      "branch": "develop" }
+      , {"name": "cloud_analytics", "branch": "master", "pattern": "^cabase" }
+      , {"name": "cloud_analytics", "branch": "master", "pattern": "^cainstsvc" }
       ]
 }

@@ -49,28 +49,45 @@ build() {
     cp $REPO/$TARBALL agents/$OUTPUT
 }
 
-num_agents=$(${ROOT}/json agents.length < ${ROOT}/build.spec)
-if [[ -n ${num_agents} ]] && [[ ${num_agents} -lt 1 ]]; then
+fetch() {
+    name=$1
+    branch=$2
+    pattern=$3
+
+    pkg_url=$packages_url/$name/$branch
+
+    if [[ -z "$pattern" ]]; then
+        filter="$name"
+    else
+        filter="$pattern"
+    fi
+
+    # Determine latest package
+    latest_pkg=$(curl -k -sS ${pkg_url}/ \
+        | grep "href=\"" \
+        | cut -d'"' -f2 \
+        | grep "$filter" \
+        | sort | tail -1
+        )
+
+    # Download it to the agents/ directory
+    (cd agents && curl ${SPEED_LIMIT} --progress-bar -k -O $pkg_url/${latest_pkg})
+}
+
+num_pkgs=$(${ROOT}/json packages.length < ${ROOT}/build.spec)
+if [[ -n ${num_pkgs} ]] && [[ ${num_pkgs} -lt 1 ]]; then
     echo "FATAL: no agents listed in ${ROOT}/build.spec"
     exit 1
 fi
 
+packages_url=$(${ROOT}/json "packages-url" < ${ROOT}/build.spec)
 idx=0
-while [[ ${idx} -lt ${num_agents} ]]; do
-    repo=$(${ROOT}/json agents[${idx}].repo < ${ROOT}/build.spec)
-    name=$(${ROOT}/json agents[${idx}].name < ${ROOT}/build.spec)
-    checkout=$(${ROOT}/json agents[${idx}].checkout < ${ROOT}/build.spec)
-    target=$(${ROOT}/json agents[${idx}].target < ${ROOT}/build.spec)
-    tarball=$(${ROOT}/json agents[${idx}].tarball < ${ROOT}/build.spec)
-    output=$(${ROOT}/json agents[${idx}].output < ${ROOT}/build.spec)
+while [[ ${idx} -lt ${num_pkgs} ]]; do
+    name=$(${ROOT}/json packages[${idx}].name < ${ROOT}/build.spec)
+    branch=$(${ROOT}/json packages[${idx}].branch < ${ROOT}/build.spec)
+    pattern=$(${ROOT}/json packages[${idx}].pattern < ${ROOT}/build.spec)
 
-    if [[ -z ${repo} ]]; then
-        data=$(${ROOT}/json agents[${idx}] < ${ROOT}/build.spec)
-        echo "FATAL: could not include agent '${data}': no repo defined"
-        exit 1
-    fi
-
-    build "${repo}" "${name}" "${checkout}" "${target}" "${tarball}" "${output}"
+    fetch "${name}" "${branch}" "${pattern}"
 
     idx=$((${idx} + 1))
 done

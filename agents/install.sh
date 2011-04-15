@@ -4,14 +4,7 @@ set -e
 set -o xtrace
 
 TMP=/var/tmp
-AGENTS="atropos.tgz
-        provisioner.tgz
-        heartbeater.tgz
-        cabase.tar.gz
-        cainstsvc.tar.gz
-        dataset_manager.tgz
-        smart-login.tgz
-        zonetracker.tgz"
+AGENTS="$(ls *.tgz)"
 AGENTS_DIR=/opt/smartdc/agents
 
 export PATH=$AGENTS_DIR/modules/.npm/atropos/active/package/local/bin:$PATH
@@ -33,22 +26,14 @@ npm-install() {
 }
 
 # Install the actual atropos agent
-tar -zxvf atropos.tgz
+tar -zxvf atropos-*.tgz
 (cd atropos && ./bootstrap.sh "$AGENTS_DIR")
 
 # Install other agents, as if we were some npm-crazed honey badger.
 
 for tarball in $AGENTS; do
     case "$tarball" in
-        atropos.tgz)
-            ;;
-
-        provisioner.tgz)
-            npm-install "./$tarball"
-            ;;
-
-        heartbeater.tgz)
-            npm-install "./$tarball"
+        atropos-*.tgz)
             ;;
 
         *)
