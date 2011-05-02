@@ -21,7 +21,7 @@ fi
 
 set -e
 
-./build_agents
+#./build_agents
 
 (cat <<__EOF__
 #!/bin/sh
