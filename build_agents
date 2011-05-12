@@ -10,7 +10,7 @@ export CC=gcc
 
 DIRNAME=`dirname $0`
 ROOT=`cd $DIRNAME && pwd`
-DEFAULT_CHECKOUT="origin/develop"
+DEFAULT_CHECKOUT="origin/release-20110512"
 
 
 build() {
