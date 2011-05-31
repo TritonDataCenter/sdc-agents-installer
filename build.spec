@@ -8,7 +8,8 @@
       , {"name": "zonetracker",     "branch": "master" }
       , {"name": "heartbeater",     "branch": "develop" }
       , {"name": "smartlogin",      "branch": "develop" }
-      , {"name": "amon-relay",      "branch": "master" }
+      , {"name": "amon",            "branch": "master", "pattern": "^amon-agent" }
+      , {"name": "amon",            "branch": "master", "pattern": "^amon-relay" }
       , {"name": "cloud_analytics", "branch": "master", "pattern": "^cabase" }
       , {"name": "cloud_analytics", "branch": "master", "pattern": "^cainstsvc" }
       ]
