@@ -6,6 +6,7 @@
       , {"name": "provisioner",     "branch": "master" }
       , {"name": "dataset_manager", "branch": "master" }
       , {"name": "zonetracker",     "branch": "master" }
+      , {"name": "provisioner-v2",  "branch": "master" }
       , {"name": "heartbeater",     "branch": "develop" }
       , {"name": "smartlogin",      "branch": "develop" }
       , {"name": "amon",            "branch": "master", "pattern": "^amon-agent" }
