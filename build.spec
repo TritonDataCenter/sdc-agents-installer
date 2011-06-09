@@ -1,17 +1,17 @@
 {
-    "release-name": "develop"
+    "release-name": "release-20110609"
   , "packages-url": "https://guest:GrojhykMid@216.57.203.66:444/coal/live_147/agents"
   , "packages":
-      [ {"name": "atropos",         "branch": "master" }
-      , {"name": "provisioner",     "branch": "master" }
-      , {"name": "dataset_manager", "branch": "master" }
-      , {"name": "zonetracker",     "branch": "master" }
-      , {"name": "provisioner-v2",  "branch": "master" }
-      , {"name": "heartbeater",     "branch": "develop" }
-      , {"name": "smartlogin",      "branch": "develop" }
-      , {"name": "amon",            "branch": "master", "pattern": "^amon-agent" }
-      , {"name": "amon",            "branch": "master", "pattern": "^amon-relay" }
-      , {"name": "cloud_analytics", "branch": "master", "pattern": "^cabase" }
-      , {"name": "cloud_analytics", "branch": "master", "pattern": "^cainstsvc" }
+      [ {"name": "amon-relay",         "branch": "release-20110609" }
+      , {"name": "atropos",         "branch": "release-20110609" }
+      , {"name": "provisioner",     "branch": "release-20110609" }
+      , {"name": "dataset_manager", "branch": "release-20110609" }
+      , {"name": "zonetracker",     "branch": "release-20110609" }
+      , {"name": "heartbeater",     "branch": "release-20110609" }
+      , {"name": "smartlogin",      "branch": "release-20110609" }
+      , {"name": "amon-relay",      "branch": "release-20110609" }
+      , {"name": "cloud_analytics", "branch": "release-20110609", "pattern": "^cabase" }
+      , {"name": "cloud_analytics", "branch": "release-20110609", "pattern": "^cainstsvc" }
       ]
 }
+
