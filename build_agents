@@ -14,7 +14,10 @@ DEFAULT_CHECKOUT="origin/develop"
 GMAKE=gmake
 
 if [[ $(uname -s) == 'Linux' ]]; then
+    BUILD_SPEC="hvm.build.spec"
     GMAKE=make
+else
+    BUILD_SPEC="build.spec"
 fi
 
 build() {
@@ -77,18 +80,18 @@ fetch() {
     (cd agents && curl ${SPEED_LIMIT} --progress-bar -k -O $pkg_url/${latest_pkg})
 }
 
-num_pkgs=$(${ROOT}/json packages.length < ${ROOT}/build.spec)
+num_pkgs=$(${ROOT}/json packages.length < ${ROOT}/${BUILD_SPEC})
 if [[ -n ${num_pkgs} ]] && [[ ${num_pkgs} -lt 1 ]]; then
-    echo "FATAL: no agents listed in ${ROOT}/build.spec"
+    echo "FATAL: no agents listed in ${ROOT}/${BUILD_SPEC}"
     exit 1
 fi
 
-packages_url=$(${ROOT}/json "packages-url" < ${ROOT}/build.spec)
+packages_url=$(${ROOT}/json "packages-url" < ${ROOT}/${BUILD_SPEC})
 idx=0
 while [[ ${idx} -lt ${num_pkgs} ]]; do
-    name=$(${ROOT}/json packages[${idx}].name < ${ROOT}/build.spec)
-    branch=$(${ROOT}/json packages[${idx}].branch < ${ROOT}/build.spec)
-    pattern=$(${ROOT}/json packages[${idx}].pattern < ${ROOT}/build.spec)
+    name=$(${ROOT}/json packages[${idx}].name < ${ROOT}/${BUILD_SPEC})
+    branch=$(${ROOT}/json packages[${idx}].branch < ${ROOT}/${BUILD_SPEC})
+    pattern=$(${ROOT}/json packages[${idx}].pattern < ${ROOT}/${BUILD_SPEC})
 
     fetch "${name}" "${branch}" "${pattern}"
 

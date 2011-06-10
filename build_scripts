@@ -1,7 +1,12 @@
 #!/bin/bash
 
+if [[ $(uname -s) == 'Linux' ]]; then
+    BUILD_SPEC="hvm.build.spec"
+else
+    BUILD_SPEC="build.spec"
+fi
 ROOT=$(cd $(dirname $0) ; pwd)
-RELEASE_NAME=$(${ROOT}/json release-name < ${ROOT}/build.spec)
+RELEASE_NAME=$(${ROOT}/json release-name < ${ROOT}/${BUILD_SPEC})
 if [[ -z ${RELEASE_NAME} ]]; then
     # Use git branch name of repo
     RELEASE_NAME=$(cd ${ROOT} && git branch | grep "^* " | cut -d' ' -f2)
@@ -21,7 +26,11 @@ fi
 
 set -e
 
-#./build_agents
+if [[ $(uname -s) != 'Linux' ]]; then
+    # For Linux platform the ubuntu-live script updates
+    # agents and we don't need the build_agents to do it.
+    ./build_agents
+fi
 
 (cat <<__EOF__
 #!/bin/sh
