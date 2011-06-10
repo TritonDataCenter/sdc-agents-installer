@@ -1,7 +1,12 @@
-#!/usr/bin/bash
+#!/bin/bash
 
+if [[ $(uname -s) == 'Linux' ]]; then
+    BUILD_SPEC="hvm.build.spec"
+else
+    BUILD_SPEC="build.spec"
+fi
 ROOT=$(cd $(dirname $0) ; pwd)
-RELEASE_NAME=$(${ROOT}/json release-name < ${ROOT}/build.spec)
+RELEASE_NAME=$(${ROOT}/json release-name < ${ROOT}/${BUILD_SPEC})
 if [[ -z ${RELEASE_NAME} ]]; then
     # Use git branch name of repo
     RELEASE_NAME=$(cd ${ROOT} && git branch | grep "^* " | cut -d' ' -f2)
@@ -9,14 +14,23 @@ fi
 if [[ -z ${RELEASE_NAME} ]]; then
     RELEASE_NAME="unknown"
 fi
-BUILDSTAMP=`TZ=UTC date "+%Y%m%dT%H%M%SZ"`; export BUILDSTAMP 
+BUILDSTAMP=`TZ=UTC date "+%Y%m%dT%H%M%SZ"`; export BUILDSTAMP
 FILENAME=agents-${RELEASE_NAME}-${BUILDSTAMP}.sh
 MD5_FILE=agents-${RELEASE_NAME}-${BUILDSTAMP}.md5sum
 TMP=/var/tmp
+SHAR=./shar
+
+if [[ $(uname -s) == 'Linux' ]]; then
+    SHAR=/usr/bin/shar
+fi
 
 set -e
 
-./build_agents
+if [[ $(uname -s) != 'Linux' ]]; then
+    # For Linux platform the ubuntu-live script updates
+    # agents and we don't need the build_agents to do it.
+    ./build_agents
+fi
 
 (cat <<__EOF__
 #!/bin/sh
@@ -26,10 +40,10 @@ fi
 __EOF__
 )> $FILENAME
 
-(./shar -D -n "Joyent" agents | grep -v '^exit 0'; cat <<EOF
+(${SHAR} -D -n "Joyent" agents | grep -v '^exit 0'; cat <<EOF
 
 if [[ -f agents/install.sh ]]; then
-    (cd agents && /usr/bin/bash ./install.sh)
+    (cd agents && /bin/bash ./install.sh)
 fi
 
 # Delete agents directory.
