@@ -56,7 +56,6 @@ EOF
 md5sum $FILENAME | cut -d' ' -f 1 > $MD5_FILE
 
 if [ ! -z "$COAL_PUBLISH" ]; then
-    scp $MD5_FILE $FILENAME jill@coal.joyent.us:/data/coal/live_147/ur-scripts/
     if [[ -d /rpool/data/coal/live_147/ur-scripts ]]; then
         pfexec cp $MD5_FILE $FILENAME /rpool/data/coal/live_147/ur-scripts/
     fi
