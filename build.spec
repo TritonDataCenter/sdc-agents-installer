@@ -3,10 +3,10 @@
   , "packages-url": "https://guest:GrojhykMid@216.57.203.66:444/coal/live_147/agents"
   , "packages":
       [ {"name": "atropos",         "branch": "master" }
-      , {"name": "provisioner",     "branch": "master" }
       , {"name": "dataset_manager", "branch": "master" }
       , {"name": "zonetracker",     "branch": "master" }
       , {"name": "provisioner-v2",  "branch": "master" }
+      , {"name": "zonetracker-v2",  "branch": "master" }
       , {"name": "heartbeater",     "branch": "develop" }
       , {"name": "smartlogin",      "branch": "develop" }
       , {"name": "amon",            "branch": "master", "pattern": "^amon-agent" }
