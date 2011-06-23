@@ -3,6 +3,7 @@
   , "packages-url": "https://guest:GrojhykMid@216.57.203.66:444/coal/live_147/agents"
   , "packages":
       [ {"name": "atropos",         "branch": "release-20110623" }
+      , {"name": "amon",         "branch": "release-20110623" }
       , {"name": "dataset_manager", "branch": "release-20110623" }
       , {"name": "zonetracker",     "branch": "release-20110623" }
       , {"name": "provisioner-v2",  "branch": "release-20110623" }
