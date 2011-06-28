@@ -4,6 +4,6 @@
   , "packages":
       [ {"name": "atropos",         "branch": "master" }
       , {"name": "provisioner",     "branch": "master" }
-      , {"name": "heartbeater",     "branch": "develop" }
+      , {"name": "heartbeater",     "branch": "master" }
       ]
 }
