@@ -1,6 +1,6 @@
 {
     "release-name": "release-20110707"
-  , "packages-url": "https://guest:GrojhykMid@216.57.203.66:444/coal/live_147/agents"
+  , "packages-url": "https://guest:GrojhykMid@216.57.203.66:444/coal/releases/2011-07-07/deps/agents"
   , "packages":
       [ {"name": "atropos",         "branch": "release-20110707" }
       , {"name": "dataset_manager", "branch": "release-20110707" }
