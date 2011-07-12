@@ -1,4 +1,4 @@
-#!/bin/bash
+#/bin/bash
 
 # Git clone and build each of the agents. Depends on passwordless access to the
 # Joyent repos.
@@ -12,13 +12,19 @@ DIRNAME=`dirname $0`
 ROOT=`cd $DIRNAME && pwd`
 DEFAULT_CHECKOUT="origin/master"
 GMAKE=gmake
-
+DO_OFFLINE=0;
 if [[ $(uname -s) == 'Linux' ]]; then
     BUILD_SPEC="hvm.build.spec"
     GMAKE=make
 else
     BUILD_SPEC="build.spec"
 fi
+
+while getopts "l:" opt; do
+    case $opt in
+        l) DO_OFFLINE=1; AGENT_SRC_DIR=$OPTARG ;;
+    esac
+done
 
 build() {
     REPO=$1
@@ -67,17 +73,29 @@ fetch() {
     else
         filter="$pattern"
     fi
+    if [[ $DO_OFFLINE == 1 ]]; then
+        # if latest.tgz exists, use that.
+        latest_pkg=$(find $AGENT_SRC_DIR | grep $filter | grep latest\.tgz | sort | tail -1)
+        if [[ -z $latest_pkg ]]; then
+            latest_pkg_pathless=$(find $AGENT_SRC_DIR | xargs -n1 basename | grep $filter | sort | tail -1)
+            latest_pkg=$(find $AGENT_SRC_DIR -name $latest_pkg_pathless)
+            (cp ${latest_pkg} agents)
+        else
+            # XXX failing here because the patterns are all ^foo which don't jive with find(1)
+            (cp ${latest_pkg} agents/$name.tgz)
+        fi
+    else
+        # Determine latest package
+        latest_pkg=$(curl -k -sS ${pkg_url}/ \
+            | grep "href=\"" \
+            | cut -d'"' -f2 \
+            | grep "$filter" \
+            | sort | tail -1
+            )
+        # Download it to the agents/ directory
+        (cd agents && curl ${SPEED_LIMIT} --progress-bar -k -O $pkg_url/${latest_pkg})
+    fi
 
-    # Determine latest package
-    latest_pkg=$(curl -k -sS ${pkg_url}/ \
-        | grep "href=\"" \
-        | cut -d'"' -f2 \
-        | grep "$filter" \
-        | sort | tail -1
-        )
-
-    # Download it to the agents/ directory
-    (cd agents && curl ${SPEED_LIMIT} --progress-bar -k -O $pkg_url/${latest_pkg})
 }
 
 num_pkgs=$(${ROOT}/json packages.length < ${ROOT}/${BUILD_SPEC})

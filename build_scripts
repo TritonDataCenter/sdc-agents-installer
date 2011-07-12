@@ -1,5 +1,11 @@
 #!/bin/bash
 
+while getopts "l:" opt; do
+    case $opt in
+        l) DO_OFFLINE=1; AGENT_SRC_DIR=$OPTARG ;;
+    esac
+done
+
 if [[ $(uname -s) == 'Linux' ]]; then
     BUILD_SPEC="hvm.build.spec"
 else
@@ -29,7 +35,11 @@ set -e
 if [[ $(uname -s) != 'Linux' ]]; then
     # For Linux platform the ubuntu-live script updates
     # agents and we don't need the build_agents to do it.
-    ./build_agents
+    if [[ -z $AGENT_SRC_DIR ]] ; then
+        ./build_agents
+    else
+        ./build_agents -l $AGENT_SRC_DIR
+    fi
 fi
 
 (cat <<__EOF__
