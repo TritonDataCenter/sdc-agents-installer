@@ -10,6 +10,7 @@
       , {"name": "heartbeater",     "branch": "master" }
       , {"name": "smartlogin",      "branch": "master" }
       , {"name": "metadata",        "branch": "master" }
+      , {"name": "mock_cloud",      "branch": "master" }
       , {"name": "cloud_analytics", "branch": "master", "pattern": "^cabase" }
       , {"name": "cloud_analytics", "branch": "master", "pattern": "^cainstsvc" }
       ]
