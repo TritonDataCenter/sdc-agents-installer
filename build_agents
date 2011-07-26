@@ -75,10 +75,10 @@ fetch() {
     fi
     if [[ $DO_OFFLINE == 1 ]]; then
         # if latest.tgz exists, use that.
-        latest_pkg=$(find $AGENT_SRC_DIR | grep $filter | grep latest\.tgz | sort | tail -1)
+        latest_pkg=$(find $AGENT_SRC_DIR/$name/$branch | grep $filter | grep latest\.tgz | sort | tail -1)
         if [[ -z $latest_pkg ]]; then
-            latest_pkg_pathless=$(find $AGENT_SRC_DIR | xargs -n1 basename | grep $filter | sort | tail -1)
-            latest_pkg=$(find $AGENT_SRC_DIR -name $latest_pkg_pathless)
+            latest_pkg_pathless=$(find $AGENT_SRC_DIR/$name/$branch | xargs -n1 basename | grep $filter | sort | tail -1)
+            latest_pkg=$(find $AGENT_SRC_DIR/$name/$branch -name $latest_pkg_pathless)
             (cp ${latest_pkg} agents)
         else
             # XXX failing here because the patterns are all ^foo which don't jive with find(1)
