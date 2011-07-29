@@ -37,7 +37,11 @@ ALL_AGENTS="atropos/atropos dataset_manager/dataset_manager heartbeater/heartbea
 
 TOP=$(cd $(dirname $0)/; pwd)
 BUILD_DIR=build
-TIMESTAMP=$(TZ=UTC date "+%Y%m%dT%H%M%SZ")
+
+if [[ -z "$TIMESTAMP" ]]; then
+    TIMESTAMP=$(TZ=UTC date "+%Y%m%dT%H%M%SZ")
+fi
+GITDESCRIBE=$(git describe --all --long --dirty | cut -d- -f3,4)
 
 SHAR=${TOP}/shar
 if [[ $(uname -s) == 'Linux' ]]; then
@@ -131,13 +135,10 @@ function mk_agents_shar() {
     for agent in $agents; do
         fetch_agent_package $agent $build_name $source_dir $build_dir
     done
-if [[ `false` ]]; then
-echo XXX hi
-fi
 
     # Create the shar.
     local tmp=/var/tmp
-    local sh_filename=agents-$build_name-$TIMESTAMP.sh
+    local sh_filename=agents-$build_name-$TIMESTAMP-$GITDESCRIBE.sh
     cd $BUILD_DIR
 
     (cat <<__EOF__
@@ -162,7 +163,7 @@ EOF
 )>> $sh_filename
 
     # Create the md5sums file.
-    local md5sum_filename=agents-$build_name-$TIMESTAMP.md5sum
+    local md5sum_filename=agents-$build_name-$TIMESTAMP-$GITDESCRIBE.md5sum
     md5sum $sh_filename | cut -d' ' -f 1 > $md5sum_filename
 
     # Copy bits to output dir, if necessary.
