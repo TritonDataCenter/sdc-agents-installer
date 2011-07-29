@@ -33,7 +33,7 @@ set -o pipefail
 
 DEFAULT_SOURCE_DIR=https://guest:GrojhykMid@216.57.203.66:444/coal/live_147/agents
 DEFAULT_BUILD_NAME=master
-ALL_AGENTS="atropos/atropos dataset_manager/dataset_manager heartbeater/heartbeater metadata/metadata mock_cloud/mock_cloud provisioner/provisioner provisioner-v2/provisioner-v2 zonetracker/zonetracker smartlogin/smartlogin cloud_analytics/cabase cloud_analytics/cainstsvc"
+ALL_AGENTS="atropos/atropos dataset_manager/dataset_manager heartbeater/heartbeater metadata/metadata mock_cloud/mock_cloud provisioner-v2/provisioner-v2 zonetracker/zonetracker smartlogin/smartlogin cloud_analytics/cabase cloud_analytics/cainstsvc"
 
 TOP=$(cd $(dirname $0)/; pwd)
 BUILD_DIR=build
