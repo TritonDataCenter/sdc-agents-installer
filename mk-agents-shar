@@ -106,7 +106,11 @@ function fetch_agent_package() {
         echo "Downloading '${url_dir}/${latest_name}' to '${to_dir}'."
         (cd $to_dir && curl --fail --connect-timeout 10 --progress-bar -k -O ${url_dir}/${latest_name})
     else
-        local latest_path=$(ls -1 ${from_dir}/${filter} | sort | tail -1)
+        local latest_name=$(ls -1 ${from_dir}/${dir}/ | grep "${base_pattern}" | sort | tail -1)
+        if [[ -z "${latest_name}" ]]; then
+            fatal "error: could not find '${base_pattern}' in '${from_dir}/${dir}'"
+        fi
+        local latest_path="${from_dir}/${dir}/${latest_name}"
         echo "Copying '${latest_path}' to '${to_dir}'."
         cp ${latest_path} ${to_dir}
     fi

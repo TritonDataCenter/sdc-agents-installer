@@ -1,3 +1,4 @@
 /*.sh
 /*.md5sum
-/agents/*.tgz
+/agents
+/build
