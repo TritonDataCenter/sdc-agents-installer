@@ -2,7 +2,7 @@
     "release-name": "master"
   , "packages-url": "https://guest:GrojhykMid@216.57.203.66:444/coal/live_147/agents"
   , "packages":
-      [ {"name": "atropos",         "branch": "master" }
+      [ {"name": "agents_core",     "branch": "master" }
       , {"name": "dataset_manager", "branch": "master" }
       , {"name": "zonetracker",     "branch": "master" }
       , {"name": "provisioner-v2",  "branch": "master" }
