@@ -42,6 +42,8 @@ if [[ $(uname -s) != 'Linux' ]]; then
     fi
 fi
 
+cp install.sh agents/
+
 (cat <<__EOF__
 #!/bin/sh
 if [ \`pwd\` != '$TMP' ]; then
