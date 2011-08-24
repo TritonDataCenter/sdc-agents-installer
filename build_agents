@@ -93,7 +93,7 @@ fetch() {
             | sort | tail -1
             )
         # Download it to the agents/ directory
-        (mkdir agents)
+        (mkdir agents || /bin/true)
         (cd agents && curl ${SPEED_LIMIT} --progress-bar -k -O $pkg_url/${latest_pkg})
     fi
 
