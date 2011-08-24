@@ -66,7 +66,7 @@ fetch() {
     branch=$2
     pattern=$3
 
-    pkg_url=$packages_url/$name/$branch
+    pkg_url=$packages_url/$name/
 
     if [[ -z "$pattern" ]]; then
         filter="$name"

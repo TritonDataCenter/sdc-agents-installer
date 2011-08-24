@@ -97,7 +97,7 @@ function fetch_agent_package() {
         # '216.57.203.66:444/coal/live_147/agents' have an additional
         # branch/build dir. We'll support that for now, though I'd like to drop
         # that dir level.
-        local url_dir="${from_dir}/${dir}/${build_name}"
+        local url_dir="${from_dir}/${dir}"
         local latest_name=$(curl -k -sS ${url_dir}/ \
             | grep "href=\"" \
             | cut -d'"' -f2 \
