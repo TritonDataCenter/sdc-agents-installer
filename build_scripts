@@ -32,6 +32,8 @@ fi
 
 set -e
 
+mkdir agents
+
 if [[ $(uname -s) != 'Linux' ]]; then
     # For Linux platform the ubuntu-live script updates
     # agents and we don't need the build_agents to do it.
