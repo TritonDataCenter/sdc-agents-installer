@@ -30,11 +30,12 @@ set -o pipefail
 
 #---- config/globals
 
+TOP=$(cd $(dirname $0)/; pwd)
+
 DEFAULT_SOURCE_DIR=https://guest:GrojhykMid@216.57.203.66:444/coal/live_147/agents
 DEFAULT_BUILD_NAME=master
-ALL_AGENTS=$(cat agents.json | json -x "*" | xargs)
+ALL_AGENTS=$(cat agents.json | ${TOP}/json -x "*" | xargs)
 
-TOP=$(cd $(dirname $0)/; pwd)
 BUILD_DIR=build
 
 if [[ -z "$TIMESTAMP" ]]; then
