@@ -1,0 +1,13 @@
+[
+  "agents_core/agents_core",
+  "dataset_manager/dataset_manager",
+  "zonetracker/zonetracker",
+  "provisioner-v2/provisioner-v2",
+  "zonetracker-v2/zonetracker-v2",
+  "heartbeater/heartbeater",
+  "smartlogin/smartlogin",
+  "metadata/metadata",
+  "mock_cloud/mock_cloud",
+  "cloud_analytics/cabase",
+  "cloud_analytics/cainstsvc"
+]

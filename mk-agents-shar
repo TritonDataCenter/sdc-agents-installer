@@ -17,8 +17,7 @@
 #    
 #    # The HVM agents shar only includes some of the agents.
 #    bin/mk-agents-shar -b hvm-master -d $BITS_DIR \
-#        atropos/atropos provisioner/provisioner \
-#        heartbeater/heartbeater
+#        provisioner/provisioner heartbeater/heartbeater
 
 if [ "$TRACE" != "" ]; then
     export PS4='${BASH_SOURCE}:${LINENO}: ${FUNCNAME[0]:+${FUNCNAME[0]}(): }'
@@ -33,7 +32,7 @@ set -o pipefail
 
 DEFAULT_SOURCE_DIR=https://guest:GrojhykMid@216.57.203.66:444/coal/live_147/agents
 DEFAULT_BUILD_NAME=master
-ALL_AGENTS="atropos/atropos dataset_manager/dataset_manager heartbeater/heartbeater metadata/metadata mock_cloud/mock_cloud provisioner-v2/provisioner-v2 zonetracker/zonetracker smartlogin/smartlogin cloud_analytics/cabase cloud_analytics/cainstsvc"
+ALL_AGENTS=$(cat agents.json | json -x "*" | xargs)
 
 TOP=$(cd $(dirname $0)/; pwd)
 BUILD_DIR=build
@@ -68,6 +67,7 @@ function usage() {
     echo "Options:"
     echo "  -h      print this help and exit"
     echo "  -b      build name, e.g. 'master' (the default), 'release-20110714'"
+    echo "          Typically the name of the repo branch."
     echo "  -d      source dir, a local path or URL"
     echo "          (default is <$DEFAULT_SOURCE_DIR>)"
     echo "  -o      output directory to which to write results, default is 'build'"
