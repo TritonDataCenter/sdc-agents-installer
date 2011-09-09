@@ -4,7 +4,7 @@ set -e
 set -o xtrace
 
 TMP=/var/tmp
-AGENTS="$(ls *.tgz *.tar.gz)"
+AGENTS="$(ls *.tgz *.tar.gz || /bin/true)"
 AGENTS_DIR=/opt/smartdc/agents
 
 export PATH=$AGENTS_DIR/modules/.npm/agents_core/active/package/local/bin:$PATH
