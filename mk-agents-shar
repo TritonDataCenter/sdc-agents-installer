@@ -39,9 +39,11 @@ ALL_AGENTS=$(cat agents.json | ${TOP}/json -x "*" | xargs)
 BUILD_DIR=build
 
 if [[ -z "$TIMESTAMP" ]]; then
-    TIMESTAMP=$(TZ=UTC date "+%Y%m%dT%H%M%SZ")
+    TIMESTAMP=$(date -u "+%Y%m%dT%H%M%SZ")
 fi
-GITDESCRIBE=$(git describe --all --long --dirty | cut -d- -f3,4)
+# Need GNU awk for multi-char arg to "-F".
+AWK=$((which gawk 2>/dev/null | grep -v "^no ") || which awk)
+GITDESCRIBE=g$(git describe --all --long --dirty | ${AWK} -F'-g' '{print $NF}')
 
 SHAR=${TOP}/shar
 if [[ $(uname -s) == 'Linux' ]]; then
