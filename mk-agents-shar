@@ -114,6 +114,13 @@ function fetch_agent_package() {
         (cd $to_dir && curl --fail --connect-timeout 10 --progress-bar -k -O ${url_dir}/${latest_name})
     else
         local latest_name=$(ls -1 ${from_dir}/${dir}/ | grep "${base_pattern}" | sort | tail -1)
+        # RELENG-198 HACK: Allow the bit to be in a BRANCH subdir, as changed
+        # by <https://mo.joyent.com/agents/commit/e2b771e2bdd5bbb445fd5365d370ce4c4a27bc09>.
+        # TODO: remove this hack at some point.
+        if [[ -z "${latest_name}" ]]; then
+            dir=${dir}/${build_name}
+            latest_name=$(ls -1 ${from_dir}/${dir}/ | grep "${base_pattern}" | sort | tail -1)
+        fi
         if [[ -z "${latest_name}" ]]; then
             fatal "error: could not find '${base_pattern}' in '${from_dir}/${dir}'"
         fi
