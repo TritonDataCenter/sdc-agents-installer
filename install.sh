@@ -63,9 +63,9 @@ cleanup-agents() {
 }
 
 cleanup-existing() {
-  if [ -f "$AGENTS_DIR/agents-npm" ] && agents-npm --no-registry ls atropos | grep 'installed'; then
+  if [ -f "$AGENTS_DIR/bin/agents-npm" ] && agents-npm --no-registry ls atropos | grep 'installed'; then
     cleanup-lime
-  elif [ -f "$AGENTS_DIR/agents-npm" ]; then
+  elif [ -f "$AGENTS_DIR/bin/agents-npm" ]; then
     cleanup-agents
   fi
 }
