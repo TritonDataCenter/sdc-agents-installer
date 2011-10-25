@@ -7,7 +7,7 @@
 #    # Build name "release-20110714", includes all agents by default.
 #    # Source dir (-d) is a local path or a URL.
 #    bin/mk-agents-shar -b release-20110714 \
-#        -d https://guest:GrojhykMid@216.57.203.66:444/coal/live_147/agents
+#        -d https://guest:GrojhykMid@stuff.joyent.us/coal/live_147/agents
 # 
 #    # Default build name is "master", default source dir is as above.
 #    bin/mk-agents-shar
@@ -97,7 +97,7 @@ function fetch_agent_package() {
     if [[ "${from_dir:0:7}" == "http://" || "${from_dir:0:8}" == "https://" ]]; then
         # Determine latest package
         # Note: For now the current agent upload dirs on
-        # '216.57.203.66:444/coal/live_147/agents' have an additional
+        # 'stuff.joyent.us/coal/live_147/agents' have an additional
         # branch/build dir. We'll support that for now, though I'd like to drop
         # that dir level.
         local url_dir="${from_dir}/${dir}"

@@ -1,6 +1,6 @@
 {
     "release-name": "master"
-  , "packages-url": "https://guest:GrojhykMid@216.57.203.66:444/coal/live_147/agents"
+  , "packages-url": "https://guest:GrojhykMid@stuff.joyent.us/coal/live_147/agents"
   , "packages":
       [ {"name": "agents_core",     "branch": "master" }
       , {"name": "dataset_manager", "branch": "master" }
