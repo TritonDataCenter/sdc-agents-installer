@@ -32,7 +32,7 @@ set -o pipefail
 
 TOP=$(cd $(dirname $0)/; pwd)
 
-DEFAULT_SOURCE_DIR=https://guest:GrojhykMid@216.57.203.66:444/coal/live_147/agents
+DEFAULT_SOURCE_DIR=https://guest:GrojhykMid@stuff.joyent.us/coal/live_147/agents
 DEFAULT_BUILD_NAME=master
 ALL_AGENTS=$(cat agents.json | ${TOP}/json -x "*" | xargs)
 
