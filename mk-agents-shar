@@ -7,17 +7,17 @@
 #    # Build name "release-20110714", includes all agents by default.
 #    # Source dir (-d) is a local path or a URL.
 #    bin/mk-agents-shar -b release-20110714 \
-#        -d https://guest:GrojhykMid@stuff.joyent.us/coal/live_147/agents
+#        -d https://guest:GrojhykMid@stuff.joyent.us/stuff/builds
 # 
 #    # Default build name is "master", default source dir is as above.
 #    bin/mk-agents-shar
 #
 #    # Using built agent packages from a local "bits" dir.
-#    bin/mk-agents-shar -b release-20110714 -d $BITS_DIR
+#    bin/mk-agents-shar -b release-20110714 -d ../../bits
 #    
 #    # The HVM agents shar only includes some of the agents.
-#    bin/mk-agents-shar -b hvm-master -d $BITS_DIR \
-#        provisioner/provisioner heartbeater/heartbeater
+#    bin/mk-agents-shar -b hvm-master -d ../../bits \
+#        agents/provisioner agents/heartbeater
 
 if [ "$TRACE" != "" ]; then
     export PS4='${BASH_SOURCE}:${LINENO}: ${FUNCNAME[0]:+${FUNCNAME[0]}(): }'
@@ -32,9 +32,9 @@ set -o pipefail
 
 TOP=$(cd $(dirname $0)/; pwd)
 
-DEFAULT_SOURCE_DIR=https://guest:GrojhykMid@stuff.joyent.us/coal/live_147/agents
+DEFAULT_SOURCE_DIR=https://guest:GrojhykMid@stuff.joyent.us/stuff/builds
 DEFAULT_BUILD_NAME=master
-ALL_AGENTS=$(cat agents.json | ${TOP}/json -x "*" | xargs)
+ALL_AGENTS=$(cat agents.json | ${TOP}/json -a | xargs)
 
 BUILD_DIR=build
 
@@ -86,21 +86,20 @@ function usage() {
 # package names to be sortable (currently that is acheived by using a
 # ISO timestamp in the package names).
 function fetch_agent_package() {
-    local name=$1
-    local build_name=$2
-    local from_dir=$3
+    local name=$1         # e.g. "ca/cabase"
+    local build_name=$2   # e.g. "release-20110901" or "master"
+    local from_dir=$3     # See example below.
     local to_dir=$4
 
     # E.g. "ca/cabase-master-20110728T214412Z-4d6102d.tar.gz"
     local dir=$(dirname $name)
     local base_pattern="^$(basename $name)-$build_name-.*"
     if [[ "${from_dir:0:7}" == "http://" || "${from_dir:0:8}" == "https://" ]]; then
-        # Determine latest package
-        # Note: For now the current agent upload dirs on
-        # 'stuff.joyent.us/coal/live_147/agents' have an additional
-        # branch/build dir. We'll support that for now, though I'd like to drop
-        # that dir level.
-        local url_dir="${from_dir}/${dir}"
+        # URL 'from_dir' example:
+        #   https://user:pass@stuff.joyent.us/stuff/builds
+        # where name='ca/cabase' is at:
+        #   https://user:pass@stuff.joyent.us/stuff/builds/ca/$branch-latest/ca/cabase-$branch-*
+        local url_dir="${from_dir}/${dir}/${build_name}-latest/${dir}"
         local latest_name=$(curl -k -sS ${url_dir}/ \
             | grep "href=\"" \
             | cut -d'"' -f2 \
@@ -113,14 +112,11 @@ function fetch_agent_package() {
         echo "Downloading '${url_dir}/${latest_name}' to '${to_dir}'."
         (cd $to_dir && curl --fail --connect-timeout 10 --progress-bar -k -O ${url_dir}/${latest_name})
     else
+        # Local bits dir 'from_dir' example:
+        #   /home/jill/joy/mountain-gorilla/bits
+        # where name='ca/cabase' is at:
+        #   /home/jill/joy/mountain-gorilla/bits/ca/cabase-$branch-*
         local latest_name=$(ls -1 ${from_dir}/${dir}/ | grep "${base_pattern}" | sort | tail -1)
-        # RELENG-198 HACK: Allow the bit to be in a BRANCH subdir, as changed
-        # by <https://mo.joyent.com/agents/commit/e2b771e2bdd5bbb445fd5365d370ce4c4a27bc09>.
-        # TODO: remove this hack at some point.
-        if [[ -z "${latest_name}" ]]; then
-            dir=${dir}/${build_name}
-            latest_name=$(ls -1 ${from_dir}/${dir}/ | grep "${base_pattern}" | sort | tail -1)
-        fi
         if [[ -z "${latest_name}" ]]; then
             fatal "error: could not find '${base_pattern}' in '${from_dir}/${dir}'"
         fi

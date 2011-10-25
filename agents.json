@@ -1,13 +1,13 @@
 [
-  "agents_core/agents_core",
-  "dataset_manager/dataset_manager",
-  "zonetracker/zonetracker",
-  "provisioner-v2/provisioner-v2",
-  "zonetracker-v2/zonetracker-v2",
-  "heartbeater/heartbeater",
+  "agents/agents_core/agents_core",
+  "agents/dataset_manager/dataset_manager",
+  "agents/zonetracker/zonetracker",
+  "agents/provisioner-v2/provisioner-v2",
+  "agents/zonetracker-v2/zonetracker-v2",
+  "agents/heartbeater/heartbeater",
+  "agents/metadata/metadata",
+  "agents/mock_cloud/mock_cloud",
   "smartlogin/smartlogin",
-  "metadata/metadata",
-  "mock_cloud/mock_cloud",
-  "cloud_analytics/cabase",
-  "cloud_analytics/cainstsvc"
+  "ca/cabase",
+  "ca/cainstsvc"
 ]
