@@ -7,17 +7,14 @@
 #    # Build name "release-20110714", includes all agents by default.
 #    # Source dir (-d) is a local path or a URL.
 #    bin/mk-agents-shar -b release-20110714 \
-#        -d https://guest:GrojhykMid@stuff.joyent.us/stuff/builds
+#        -d https://guest:pass@stuff.joyent.us/stuff/builds
 # 
 #    # Default build name is "master", default source dir is as above.
 #    bin/mk-agents-shar
 #
 #    # Using built agent packages from a local "bits" dir.
 #    bin/mk-agents-shar -b release-20110714 -d ../../bits
-#    
-#    # The HVM agents shar only includes some of the agents.
-#    bin/mk-agents-shar -b hvm-master -d ../../bits \
-#        agents/provisioner agents/heartbeater
+#
 
 if [ "$TRACE" != "" ]; then
     export PS4='${BASH_SOURCE}:${LINENO}: ${FUNCNAME[0]:+${FUNCNAME[0]}(): }'
@@ -93,13 +90,16 @@ function fetch_agent_package() {
 
     # E.g. "ca/cabase-master-20110728T214412Z-4d6102d.tar.gz"
     local dir=$(dirname $name)
+    local scope=${name%%/*}    # "a/b/c" -> "a"
     local base_pattern="^$(basename $name)-$build_name-.*"
     if [[ "${from_dir:0:7}" == "http://" || "${from_dir:0:8}" == "https://" ]]; then
         # URL 'from_dir' example:
         #   https://user:pass@stuff.joyent.us/stuff/builds
         # where name='ca/cabase' is at:
         #   https://user:pass@stuff.joyent.us/stuff/builds/ca/$branch-latest/ca/cabase-$branch-*
-        local url_dir="${from_dir}/${dir}/${build_name}-latest/${dir}"
+        # where name='agents/metadata/metadata' is at:
+        #   https://user:pass@stuff.joyent.us/stuff/builds/agents/$branch-latest/agents/metadata/metadata-$branch-*
+        local url_dir="${from_dir}/${scope}/${build_name}-latest/${dir}"
         local latest_name=$(curl -k -sS ${url_dir}/ \
             | grep "href=\"" \
             | cut -d'"' -f2 \
@@ -116,6 +116,8 @@ function fetch_agent_package() {
         #   /home/jill/joy/mountain-gorilla/bits
         # where name='ca/cabase' is at:
         #   /home/jill/joy/mountain-gorilla/bits/ca/cabase-$branch-*
+        # where name='agents/metadata/metadata' is at:
+        #   /home/jill/joy/mountain-gorilla/bits/agents/metadata/metadata-$branch-*
         local latest_name=$(ls -1 ${from_dir}/${dir}/ | grep "${base_pattern}" | sort | tail -1)
         if [[ -z "${latest_name}" ]]; then
             fatal "error: could not find '${base_pattern}' in '${from_dir}/${dir}'"
@@ -170,7 +172,7 @@ EOF
 
     # Create the md5sums file.
     local md5sum_filename=agents-$build_name-$TIMESTAMP-$GITDESCRIBE.md5sum
-    md5sum $sh_filename | cut -d' ' -f 1 > $md5sum_filename
+    openssl dgst -md5 $sh_filename | cut -d' ' -f 2 > $md5sum_filename
 
     # Copy bits to output dir, if necessary.
     cd $TOP
