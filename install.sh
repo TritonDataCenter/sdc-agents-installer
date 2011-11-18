@@ -36,7 +36,7 @@ then
     /opt/smartdc/agents/bin/agents-npm uninstall atropos
 
     rm /opt/smartdc/agents/bin/agents-npm
-    for dir in $(ls /opt/smartdc/agents/ | grep -v "^db$"); do
+    for dir in $(ls /opt/smartdc/agents/ | grep -v "^db\$|^smf\$"); do
         rm -fr $AGENTS_DIR/$dir
     done
 elif [ -f /opt/smartdc/agents/bin/agents-npm ]; then
@@ -48,7 +48,7 @@ elif [ -f /opt/smartdc/agents/bin/agents-npm ]; then
 
         /opt/smartdc/agents/bin/agents-npm uninstall $agent;
     done
-    for dir in $(ls /opt/smartdc/agents/ | grep -v "^db$"); do
+    for dir in $(ls /opt/smartdc/agents/ | grep -v "^db\$|^smf\$"); do
         rm -fr $AGENTS_DIR/$dir
     done
     rm /opt/smartdc/agents/bin/agents-npm
