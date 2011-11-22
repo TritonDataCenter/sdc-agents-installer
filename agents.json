@@ -9,5 +9,7 @@
   "agents/mock_cloud/mock_cloud",
   "smartlogin/smartlogin",
   "ca/cabase",
-  "ca/cainstsvc"
+  "ca/cainstsvc",
+  "amon/amon-agent",
+  "amon/amon-relay"
 ]
