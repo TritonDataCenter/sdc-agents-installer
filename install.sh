@@ -28,12 +28,15 @@ npm-install() {
 }
 
 rm-agent-dirs() {
-  for dir in $(ls "$AGENTS_DIR" | grep -v "^db$"); do
-    if [ "$dir" == "smf" ]; then
-      rm $AGENTS_DIR/$dir/*
-    else
-      rm -fr $AGENTS_DIR/$dir
-    fi
+  for dir in $(ls "$AGENTS_DIR"); do
+    case "$dir" in
+      db|smf)
+        continue
+        ;;
+      *)
+        rm -fr $AGENTS_DIR/$dir
+        ;;
+    esac
   done
 }
 
