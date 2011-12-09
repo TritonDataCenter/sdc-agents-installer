@@ -22,6 +22,19 @@ npm-install() {
     $AGENTS_DIR/bin/agents-npm --no-registry install "$WHAT"
 }
 
+rm-agent-dirs() {
+    for dir in $(ls "$AGENTS_DIR"); do
+        case "$dir" in
+            db|smf)
+                continue
+                ;;
+            *)
+                rm -fr $AGENTS_DIR/$dir
+                ;;
+        esac
+    done
+}
+
 # Upgrade from Lime-era release.
 if [ -f /opt/smartdc/agents/bin/agents-npm ] && /opt/smartdc/agents/bin/agents-npm --no-registry ls atropos | grep 'installed';
 then
@@ -35,10 +48,7 @@ then
     done
     /opt/smartdc/agents/bin/agents-npm uninstall atropos
 
-    rm /opt/smartdc/agents/bin/agents-npm
-    for dir in $(ls /opt/smartdc/agents/ | grep -v "^db\$|^smf\$"); do
-        rm -fr $AGENTS_DIR/$dir
-    done
+    rm-agent-dirs
 elif [ -f /opt/smartdc/agents/bin/agents-npm ]; then
     TOREMOVE="$(/opt/smartdc/agents/bin/agents-npm --no-registry ls installed)"
     for agent in "$TOREMOVE"; do
@@ -48,12 +58,9 @@ elif [ -f /opt/smartdc/agents/bin/agents-npm ]; then
 
         /opt/smartdc/agents/bin/agents-npm uninstall $agent;
     done
-    for dir in $(ls /opt/smartdc/agents/ | grep -v "^db\$|^smf\$"); do
-        rm -fr $AGENTS_DIR/$dir
-    done
-    rm /opt/smartdc/agents/bin/agents-npm
-fi
 
+    rm-agent-dirs
+fi
 
 # Run the bootstrap script
 if [ ! -f $AGENTS_DIR/bin/agents-npm ] || $AGENTS_DIR/bin/agents-npm --no-registry ls agents_core | grep 'installed'; then
