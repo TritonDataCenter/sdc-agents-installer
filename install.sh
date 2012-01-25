@@ -70,7 +70,7 @@ cleanup-existing() {
     cleanup-lime
   elif [ -f "$AGENTS_DIR/bin/agents-npm" ]; then
     cleanup-npm-agents
-  elif [ -f "$AGENTS_DIR/bin/apm" ]; then
+  #elif [ -f "$AGENTS_DIR/bin/apm" ]; then
     # cleanup-apm
   fi
 }
