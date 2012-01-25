@@ -22,9 +22,9 @@ message() {
   echo "==> $*" >&2
 }
 
-npm-install() {
+agents-install() {
   WHAT=$1
-  agents-npm --no-registry install "$WHAT"
+  apm install "$WHAT"
 }
 
 rm-agent-dirs() {
@@ -51,7 +51,7 @@ cleanup-lime() {
   rm-agent-dirs
 }
 
-cleanup-agents() {
+cleanup-npm-agents() {
   message "Updating existing agents install."
   TOREMOVE="$(agents-npm --no-registry ls installed | awk '{ print $1 }')"
   for agent in "$TOREMOVE"; do
@@ -69,7 +69,9 @@ cleanup-existing() {
   if [ -f "$AGENTS_DIR/bin/agents-npm" ] && agents-npm --no-registry ls atropos | grep 'installed'; then
     cleanup-lime
   elif [ -f "$AGENTS_DIR/bin/agents-npm" ]; then
-    cleanup-agents
+    cleanup-npm-agents
+  elif [ -f "$AGENTS_DIR/bin/apm" ]; then
+    # cleanup-apm
   fi
 }
 
@@ -89,7 +91,7 @@ install-agents() {
       agents_core-*.tgz)
         ;;
       *)
-        npm-install "./$tarball"
+        agents-install "./$tarball"
         ;;
     esac
   done
