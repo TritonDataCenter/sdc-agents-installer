@@ -8,7 +8,7 @@
 #    # Source dir (-d) is a local path or a URL.
 #    bin/mk-agents-shar -b release-20110714 \
 #        -d https://guest:pass@stuff.joyent.us/stuff/builds
-# 
+#
 #    # Default build name is "master", default source dir is as above.
 #    bin/mk-agents-shar
 #
@@ -30,7 +30,7 @@ set -o pipefail
 TOP=$(cd $(dirname $0)/; pwd)
 
 DEFAULT_SOURCE_DIR=https://guest:GrojhykMid@stuff.joyent.us/stuff/builds
-DEFAULT_BUILD_NAME=master
+DEFAULT_BUILD_NAMES=master
 ALL_AGENTS=$(cat agents.json | ${TOP}/json -a | xargs)
 
 BUILD_DIR=build
@@ -66,8 +66,11 @@ function usage() {
     echo ""
     echo "Options:"
     echo "  -h      print this help and exit"
-    echo "  -b      build name, e.g. 'master' (the default), 'release-20110714'"
-    echo "          Typically the name of the repo branch."
+    echo "  -b      build name(s), e.g. 'master' (the default), 'release-20110714'"
+    echo "          Typically the name of the repo branch. Note this can"
+    echo "          be multiple space-separated build names (e.g. "
+    echo "          'feature1 master'). Each name is attempted to find an "
+    echo "          agent package for each agent."
     echo "  -d      source dir, a local path or URL"
     echo "          (default is <$DEFAULT_SOURCE_DIR>)"
     echo "  -o      output directory to which to write results, default is 'build'"
@@ -83,57 +86,72 @@ function usage() {
 # package names to be sortable (currently that is acheived by using a
 # ISO timestamp in the package names).
 function fetch_agent_package() {
-    local name=$1         # e.g. "ca/cabase"
-    local build_name=$2   # e.g. "release-20110901" or "master"
+    local name=$1         # e.g. "ca/cabase" or "agents/provisioner-v2/provisioner-v2"
+    local build_names=$2  # e.g. "release-20110901" or "master"
+                          #     or "feature1 master" to try a feature1 branch
+                          #     with master fallback if not available
     local from_dir=$3     # See example below.
     local to_dir=$4
+    local success=
 
-    # E.g. "ca/cabase-master-20110728T214412Z-4d6102d.tar.gz"
-    local dir=$(dirname $name)
-    local scope=${name%%/*}    # "a/b/c" -> "a"
-    local base_pattern="^$(basename $name)-$build_name-.*"
-    if [[ "${from_dir:0:7}" == "http://" || "${from_dir:0:8}" == "https://" ]]; then
-        # URL 'from_dir' example:
-        #   https://user:pass@stuff.joyent.us/stuff/builds
-        # where name='ca/cabase' is at:
-        #   https://user:pass@stuff.joyent.us/stuff/builds/ca/$branch-latest/ca/cabase-$branch-*
-        # where name='agents/metadata/metadata' is at:
-        #   https://user:pass@stuff.joyent.us/stuff/builds/agents/$branch-latest/agents/metadata/metadata-$branch-*
-        local url_dir="${from_dir}/${scope}/${build_name}-latest/${dir}"
-        local latest_name=$(curl -k -sS ${url_dir}/ \
-            | grep "href=\"" \
-            | cut -d'"' -f2 \
-            | grep "${base_pattern}" \
-            | sort | tail -1
-            )
-        if [[ -z "${latest_name}" ]]; then
-            fatal "error: could not find '${base_pattern}' in '${url_dir}'"
+    for one_build_name in $build_names; do
+        # E.g. "ca/cabase-master-20110728T214412Z-4d6102d.tar.gz"
+        local dir=$(dirname $name)
+        local scope=${name%%/*}    # "a/b/c" -> "a"
+        local base_pattern="^$(basename $name)-$one_build_name-.*"
+        if [[ "${from_dir:0:7}" == "http://" || "${from_dir:0:8}" == "https://" ]]; then
+            # URL 'from_dir' example:
+            #   https://user:pass@stuff.joyent.us/stuff/builds
+            # where name='ca/cabase' is at:
+            #   https://user:pass@stuff.joyent.us/stuff/builds/ca/$branch-latest/ca/cabase-$branch-*
+            # where name='agents/metadata/metadata' is at:
+            #   https://user:pass@stuff.joyent.us/stuff/builds/agents/$branch-latest/agents/metadata/metadata-$branch-*
+            local url_dir="${from_dir}/${scope}/${one_build_name}-latest/${dir}"
+            local latest_name=$(curl -k -sS ${url_dir}/ \
+                | grep "href=\"" \
+                | cut -d'"' -f2 \
+                | grep "${base_pattern}" \
+                | sort | tail -1
+                )
+            if [[ -z "${latest_name}" ]]; then
+                echo "WARN: could not find '${base_pattern}' in '${url_dir}'"
+            else
+                echo "Downloading '${url_dir}/${latest_name}' to '${to_dir}'."
+                (cd $to_dir && curl --fail --connect-timeout 10 --progress-bar -k -O ${url_dir}/${latest_name})
+                success=1
+                break
+            fi
+        else
+            # Local bits dir 'from_dir' example:
+            #   /home/jill/joy/mountain-gorilla/bits
+            # where name='ca/cabase' is at:
+            #   /home/jill/joy/mountain-gorilla/bits/ca/cabase-$branch-*
+            # where name='agents/metadata/metadata' is at:
+            #   /home/jill/joy/mountain-gorilla/bits/agents/metadata/metadata-$branch-*
+            local latest_name=$(ls -1 ${from_dir}/${dir}/ | grep "${base_pattern}" | sort | tail -1)
+            if [[ -z "${latest_name}" ]]; then
+                echo "WARN: could not find '${base_pattern}' in '${from_dir}/${dir}'"
+            else
+                local latest_path="${from_dir}/${dir}/${latest_name}"
+                echo "Copying '${latest_path}' to '${to_dir}'."
+                cp ${latest_path} ${to_dir}
+                success=1
+                break
+            fi
         fi
-        echo "Downloading '${url_dir}/${latest_name}' to '${to_dir}'."
-        (cd $to_dir && curl --fail --connect-timeout 10 --progress-bar -k -O ${url_dir}/${latest_name})
-    else
-        # Local bits dir 'from_dir' example:
-        #   /home/jill/joy/mountain-gorilla/bits
-        # where name='ca/cabase' is at:
-        #   /home/jill/joy/mountain-gorilla/bits/ca/cabase-$branch-*
-        # where name='agents/metadata/metadata' is at:
-        #   /home/jill/joy/mountain-gorilla/bits/agents/metadata/metadata-$branch-*
-        local latest_name=$(ls -1 ${from_dir}/${dir}/ | grep "${base_pattern}" | sort | tail -1)
-        if [[ -z "${latest_name}" ]]; then
-            fatal "error: could not find '${base_pattern}' in '${from_dir}/${dir}'"
-        fi
-        local latest_path="${from_dir}/${dir}/${latest_name}"
-        echo "Copying '${latest_path}' to '${to_dir}'."
-        cp ${latest_path} ${to_dir}
+    done
+
+    if [[ -z "$success" ]]; then
+        fatal "could not find '$name' agent package with build name '$build_names' in '$from_dir'"
     fi
 }
 
 function mk_agents_shar() {
     local agents="$1"
-    local build_name=$2
+    local build_names="$2"
     local source_dir="$3"
     local output_dir="$4"
-    echo "Make '$build_name' agents shar (timestamp $TIMESTAMP) from '${source_dir}'."
+    echo "Make '$build_names' agents shar (timestamp $TIMESTAMP) from '${source_dir}'."
 
     # Get all the agents files and boilerplate into the build dir.
     local build_dir=$BUILD_DIR/agents
@@ -141,12 +159,13 @@ function mk_agents_shar() {
     mkdir -p $build_dir
     cp install.sh $build_dir
     for agent in $agents; do
-        fetch_agent_package $agent $build_name $source_dir $build_dir
+        fetch_agent_package "$agent" "$build_names" "$source_dir" "$build_dir"
     done
 
     # Create the shar.
+    local first_build_name=$(echo $build_names | xargs -n1 | head -1)
     local tmp=/var/tmp
-    local sh_filename=agents-$build_name-$TIMESTAMP-$GITDESCRIBE.sh
+    local sh_filename=agents-$first_build_name-$TIMESTAMP-$GITDESCRIBE.sh
     cd $BUILD_DIR
 
     (cat <<__EOF__
@@ -171,7 +190,7 @@ EOF
 )>> $sh_filename
 
     # Create the md5sums file.
-    local md5sum_filename=agents-$build_name-$TIMESTAMP-$GITDESCRIBE.md5sum
+    local md5sum_filename=agents-$first_build_name-$TIMESTAMP-$GITDESCRIBE.md5sum
     openssl dgst -md5 $sh_filename | cut -d' ' -f 2 > $md5sum_filename
 
     # Copy bits to output dir, if necessary.
@@ -189,7 +208,7 @@ EOF
 #---- mainline
 
 # Process arguments.
-build_name=$DEFAULT_BUILD_NAME
+build_names=$DEFAULT_BUILD_NAMES
 source_dir=$DEFAULT_SOURCE_DIR
 output_dir=$BUILD_DIR
 while getopts "hb:d:o:" c; do
@@ -199,7 +218,7 @@ while getopts "hb:d:o:" c; do
         exit 0
         ;;
     b)
-        build_name=$OPTARG
+        build_names=$OPTARG
         ;;
     d)
         source_dir=$OPTARG
@@ -220,6 +239,5 @@ if [[ -z "$agents" ]]; then
     agents="$ALL_AGENTS"
 fi
 
-mk_agents_shar "$agents" $build_name "$source_dir" "$output_dir"
+mk_agents_shar "$agents" "$build_names" "$source_dir" "$output_dir"
 exit $?
-
