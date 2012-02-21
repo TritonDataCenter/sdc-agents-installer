@@ -163,7 +163,7 @@ function mk_agents_shar() {
     done
 
     # Create the shar.
-    local first_build_name=$(echo $build_names | xargs -n1 | head -1)
+    local first_build_name=$(echo $build_names | xargs -n1 2>/dev/null | head -1)
     local tmp=/var/tmp
     local sh_filename=agents-$first_build_name-$TIMESTAMP-$GITDESCRIBE.sh
     cd $BUILD_DIR
