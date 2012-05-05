@@ -44,6 +44,13 @@ then
             continue
         fi
 
+        # Supress possible npm warning removing CA (See AGENT-392)
+        if (echo "$agent" | grep '^cainstsvc'); then
+            if [ -e $AGENTS_DIR/smf/cainstsvc-default.xml ]; then
+                touch $AGENTS_DIR/smf/cainstsvc.xml
+            fi
+        fi
+
         /opt/smartdc/agents/bin/agents-npm uninstall $agent;
     done
     /opt/smartdc/agents/bin/agents-npm uninstall atropos
@@ -54,6 +61,13 @@ elif [ -f /opt/smartdc/agents/bin/agents-npm ]; then
     for agent in "$TOREMOVE"; do
         if (echo "$agent" | grep '^atropos@'); then 
             continue
+        fi
+
+        # Supress possible npm warning removing CA (See AGENT-392)
+        if (echo "$agent" | grep '^cainstsvc'); then
+            if [ -e $AGENTS_DIR/smf/cainstsvc-default.xml ]; then
+                touch $AGENTS_DIR/smf/cainstsvc.xml
+            fi
         fi
 
         /opt/smartdc/agents/bin/agents-npm uninstall $agent;
@@ -74,6 +88,7 @@ for tarball in $AGENTS; do
     case "$tarball" in
         agents_core-*.tgz)
             ;;
+
         *)
             npm-install "./$tarball"
             ;;
