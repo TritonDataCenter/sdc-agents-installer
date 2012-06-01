@@ -31,7 +31,7 @@ TOP=$(cd $(dirname $0)/; pwd)
 
 DEFAULT_SOURCE_DIR=https://guest:GrojhykMid@stuff.joyent.us/stuff/builds
 DEFAULT_BUILD_NAMES=master
-ALL_AGENTS=$(cat agents.json | ${TOP}/json -a | xargs)
+ALL_AGENTS=$(cat agents.json | json -a | xargs)
 
 BUILD_DIR=build
 
