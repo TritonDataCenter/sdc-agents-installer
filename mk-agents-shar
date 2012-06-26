@@ -29,7 +29,23 @@ set -o pipefail
 
 TOP=$(cd $(dirname $0)/; pwd)
 
-DEFAULT_SOURCE_DIR=https://guest:GrojhykMid@stuff.joyent.us/stuff/builds
+DEFAULT_SOURCE_DIR=https://stuff.joyent.us/stuff/builds
+DEFAULT_OPEN_SOURCE_DIR=http://stuff:kie7Ooph@stuff.smartdatacenter.org
+
+if [[ ! -f ~/.sdcbuild.json ]]; then
+  (scp -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -o \
+  BatchMode=yes stuff@stuff.joyent.us:.sdcbuild.json ~/.sdcbuild.json || \
+  /usr/bin/true)
+fi
+
+if [[ -f ~/.sdcbuild.json ]]; then
+  username=$(cat ~/.sdcbuild.json | json username)
+  password=$(cat ~/.sdcbuild.json | json password)
+  DEFAULT_SOURCE_DIR=$(echo $DEFAULT_SOURCE_DIR | sed -e "s/\/\//\/\/${username}:${password}@/g")
+else
+  DEFAULT_SOURCE_DIR=${DEFAULT_OPEN_SOURCE_DIR}
+fi
+
 DEFAULT_BUILD_NAMES=master
 ALL_AGENTS=$(cat agents.json | json -a | xargs)
 
