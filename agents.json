@@ -1,8 +1,8 @@
 [
-  "agents/agents_core/agents_core",
-  "agents/provisioner-v2/provisioner-v2",
-  "agents/zonetracker-v2/zonetracker-v2",
-  "agents/heartbeater/heartbeater",
+  "agents_core/agents_core",
+  "provisioner/provisioner",
+  "zonetracker/zonetracker",
+  "heartbeater/heartbeater",
   "smartlogin/smartlogin",
   "ca/cabase",
   "ca/cainstsvc",
