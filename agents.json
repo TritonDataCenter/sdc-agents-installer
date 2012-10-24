@@ -7,5 +7,6 @@
   "ca/cabase",
   "ca/cainstsvc",
   "amon/amon-agent",
-  "amon/amon-relay"
+  "amon/amon-relay",
+  "marlin/marlin"
 ]
