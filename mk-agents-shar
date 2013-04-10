@@ -29,7 +29,8 @@ set -o pipefail
 
 TOP=$(cd $(dirname $0)/; pwd)
 
-DEFAULT_SOURCE_DIR=https://bits.joyent.us/builds
+#DEFAULT_SOURCE_DIR=https://bits.joyent.us/builds
+DEFAULT_SOURCE_DIR=https://stuff.joyent.us/stuff/builds
 DEFAULT_OPEN_SOURCE_DIR=http://stuff:kie7Ooph@stuff.smartdatacenter.org
 
 if [[ ! -f ~/.sdcbuild.json ]]; then
