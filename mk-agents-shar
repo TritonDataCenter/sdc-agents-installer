@@ -29,13 +29,12 @@ set -o pipefail
 
 TOP=$(cd $(dirname $0)/; pwd)
 
-#DEFAULT_SOURCE_DIR=https://bits.joyent.us/builds
-DEFAULT_SOURCE_DIR=https://stuff.joyent.us/stuff/builds
+DEFAULT_SOURCE_DIR=https://bits.joyent.us/builds
 DEFAULT_OPEN_SOURCE_DIR=http://stuff:kie7Ooph@stuff.smartdatacenter.org
 
 if [[ ! -f ~/.sdcbuild.json ]]; then
   (scp -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -o \
-  BatchMode=yes bits@bits.joyent.us:etc/.sdcbuild.json ~/.sdcbuild.json || \
+  BatchMode=yes stuff@stuff.joyent.us:builds-etc/.sdcbuild.json ~/.sdcbuild.json || \
   /usr/bin/true)
 fi
 
