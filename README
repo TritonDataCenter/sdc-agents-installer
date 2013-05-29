@@ -1,3 +1,9 @@
+**WARNING**: This branch is not used. The 'release-20110901-upgrade'
+agents shar (aka 'agentsshar-upgrade') is built out of the *master*
+branch of this repo. Sue me. --Trent
+
+
+
 Note for this branch (release-20110901-upgrade): We are attempting
 to use this repo to build a shar for the "agents-upgrade", i.e. the
 6.5 agents for 6.5 CNs during a transition to SDC7.
