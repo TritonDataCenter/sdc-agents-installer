@@ -1,15 +1,21 @@
-Building the agents-<buildstamp>.sh script
-==========================================
+Note for this branch (release-20110901-upgrade): We are attempting
+to use this repo to build a shar for the "agents-upgrade", i.e. the
+6.5 agents for 6.5 CNs during a transition to SDC7.
 
-NOTE: This must be run on a 147 build machine such as bh1-build or bh1-autobuild.
-For details on how to setup such an environment see here:
+Between 6.5 and 7 the building of the source agent packages that
+go in the shar has changed: They are build separately and are
+uploaded to bits.joyent.us in a dir structure defined by MG
+(moutain-gorilla.git). That means a slightly different layout
+such that we abuse the arguments to `mk-agents-shar` a little
+bit.
 
- https://hub.joyent.com/wiki/display/dev/joyent_147
+The main build target here is:
 
-# build the atropos.tgz and provisioner.tgz files (using: CC=gcc gmake all npm)
-* copy the atropos.tgz and provisioner.tgz files into the agents/ directory
-* run ./build_scripts from this directory
+    make upgradeshar
 
+However note that the MG-managed version of this build (see
+the MG "agentsshar-upgrade" target) uses `mk-agents-shar`
+directly and slightly differently.
 
 What this does
 ==============
