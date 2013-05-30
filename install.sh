@@ -24,7 +24,7 @@ message() {
 
 agents-install() {
   WHAT=$1
-  apm install "$WHAT"
+  $INSTALLER install "$WHAT"
 }
 
 rm-agent-dirs() {
@@ -97,8 +97,16 @@ install-agents() {
   done
 }
 
-cleanup-existing
-bootstrap
+# The 6.5 upgrade agent shar does not contain the agents_core-* tarball
+if [ -z "`ls agents_core-*.tgz 2>/dev/null`" ]; then
+    # This is the installer for the 6.5 upgrade agents
+    INSTALLER=agents-npm
+else
+    INSTALLER=apm
+    cleanup-existing
+    bootstrap
+fi
+
 install-agents
 
 exit 0
