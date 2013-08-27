@@ -9,5 +9,6 @@
   "ca/cainstsvc",
   "amon/amon-agent",
   "amon/amon-relay",
-  "marlin/marlin"
+  "marlin/marlin",
+  "firewaller/firewaller"
 ]
