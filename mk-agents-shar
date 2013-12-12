@@ -143,6 +143,7 @@ function fetch_agent_package() {
             #   /home/jill/joy/mountain-gorilla/bits/ca/cabase-$branch-*
             # where name='agents/metadata/metadata' is at:
             #   /home/jill/joy/mountain-gorilla/bits/agents/metadata/metadata-$branch-*
+            local dir=$(dirname $name)
             local latest_name=$(ls -1 ${from_dir}/${dir}/ | grep "${base_pattern}" | sort | tail -1)
             if [[ -z "${latest_name}" ]]; then
                 echo "WARN: could not find '${base_pattern}' in '${from_dir}/${dir}'"
