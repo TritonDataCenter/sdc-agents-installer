@@ -111,11 +111,11 @@ function fetch_agent_package() {
     local from_dir=$3     # See example below.
     local to_dir=$4
     local success=
-
     local dir=$(dirname $name)
-    local base_pattern="^$(basename $name)-$one_build_name-.*"
 
     for one_build_name in $build_names; do
+        local base_pattern="^$(basename $name)-$one_build_name-.*"
+
         if [[ ! -d ${from_dir} ]]; then      # Not manta
             # E.g. "ca/cabase-master-20110728T214412Z-4d6102d.tar.gz"
             local scope=${name%%/*}    # "a/b/c" -> "a"
