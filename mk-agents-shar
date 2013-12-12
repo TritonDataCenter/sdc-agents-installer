@@ -112,12 +112,13 @@ function fetch_agent_package() {
     local to_dir=$4
     local success=
 
+    local dir=$(dirname $name)
+    local base_pattern="^$(basename $name)-$one_build_name-.*"
+
     for one_build_name in $build_names; do
         if [[ ! -d ${from_dir} ]]; then      # Not manta
             # E.g. "ca/cabase-master-20110728T214412Z-4d6102d.tar.gz"
-            local dir=$(dirname $name)
             local scope=${name%%/*}    # "a/b/c" -> "a"
-            local base_pattern="^$(basename $name)-$one_build_name-.*"
             local latest_dir=$(mget -q ${from_dir}/${scope}/${one_build_name}-latest)
 
             [[ -n ${latest_dir} ]] || fatal "Unable to determine latest build of ${name}"
@@ -143,7 +144,6 @@ function fetch_agent_package() {
             #   /home/jill/joy/mountain-gorilla/bits/ca/cabase-$branch-*
             # where name='agents/metadata/metadata' is at:
             #   /home/jill/joy/mountain-gorilla/bits/agents/metadata/metadata-$branch-*
-            local dir=$(dirname $name)
             local latest_name=$(ls -1 ${from_dir}/${dir}/ | grep "${base_pattern}" | sort | tail -1)
             if [[ -z "${latest_name}" ]]; then
                 echo "WARN: could not find '${base_pattern}' in '${from_dir}/${dir}'"
