@@ -29,23 +29,25 @@ set -o pipefail
 
 TOP=$(cd $(dirname $0)/; pwd)
 
-DEFAULT_SOURCE_DIR=https://bits.joyent.us/builds
-DEFAULT_OPEN_SOURCE_DIR=http://stuff:kie7Ooph@stuff.smartdatacenter.org
+# Put the Manta tools that 'make deps' installed for us first.
+export PATH="${TOP}/node_modules/manta/bin:${PATH}"
 
-if [[ ! -f ~/.sdcbuild.json ]]; then
-  (scp -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -o \
-  BatchMode=yes stuff@stuff.joyent.us:builds-etc/.sdcbuild.json ~/.sdcbuild.json || \
-  /usr/bin/true)
+# --- Manta config
+if [[ -z "$MANTA_KEY_ID" ]]; then
+    export MANTA_KEY_ID=`ssh-keygen -l -f ~/.ssh/id_rsa.pub | awk '{print $2}' | tr -d '\n'`
 fi
-
-if [[ -f ~/.sdcbuild.json ]]; then
-  username=$(cat ~/.sdcbuild.json | json username)
-  password=$(cat ~/.sdcbuild.json | json password)
-  DEFAULT_SOURCE_DIR=$(echo $DEFAULT_SOURCE_DIR | sed -e "s/\/\//\/\/${username}:${password}@/g")
-else
-  DEFAULT_SOURCE_DIR=${DEFAULT_OPEN_SOURCE_DIR}
+if [[ -z "$MANTA_USER" ]]; then
+    export MANTA_USER="Joyent_Dev";
 fi
+export MANTA_URL=https://us-east.manta.joyent.com
+export MANTA_BASE="/Joyent_Dev/stor/builds"
 
+[[ -n ${MANTA_KEY_ID} ]] || fatal "missing MANTA_KEY_ID"
+[[ -n ${MANTA_USER} ]] || fatal "missing MANTA_USER"
+[[ -n ${MANTA_URL} ]] || fatal "missing MANTA_URL"
+[[ -n ${MANTA_BASE} ]] || fatal "missing MANTA_BASE"
+
+DEFAULT_SOURCE_DIR=${MANTA_BASE}
 DEFAULT_BUILD_NAMES=master
 ALL_AGENTS=$(cat agents.json | json -a | xargs)
 
@@ -111,31 +113,28 @@ function fetch_agent_package() {
     local success=
 
     for one_build_name in $build_names; do
-        # E.g. "ca/cabase-master-20110728T214412Z-4d6102d.tar.gz"
-        local dir=$(dirname $name)
-        local scope=${name%%/*}    # "a/b/c" -> "a"
-        local base_pattern="^$(basename $name)-$one_build_name-.*"
-        if [[ "${from_dir:0:7}" == "http://" || "${from_dir:0:8}" == "https://" ]]; then
-            # URL 'from_dir' example:
-            #   https://user:pass@bits.joyent.us/builds
-            # where name='ca/cabase' is at:
-            #   https://user:pass@bits.joyent.us/builds/ca/$branch-latest/ca/cabase-$branch-*
-            # where name='agents/metadata/metadata' is at:
-            #   https://user:pass@bits.joyent.us/builds/agents/$branch-latest/agents/metadata/metadata-$branch-*
-            local url_dir="${from_dir}/${scope}/${one_build_name}-latest/${dir}"
-            local latest_name=$(curl -k -sS ${url_dir}/ \
-                | grep "href=\"" \
-                | cut -d'"' -f2 \
+        if [[ ! -d ${from_dir} ]]; then      # Not manta
+            # E.g. "ca/cabase-master-20110728T214412Z-4d6102d.tar.gz"
+            local dir=$(dirname $name)
+            local scope=${name%%/*}    # "a/b/c" -> "a"
+            local base_pattern="^$(basename $name)-$one_build_name-.*"
+            local latest_dir=$(mget -q ${from_dir}/${scope}/${one_build_name}-latest)
+
+            [[ -n ${latest_dir} ]] || fatal "Unable to determine latest build of ${name}"
+
+            local latest_name=$(mls ${latest_dir}/${dir} \
                 | grep "${base_pattern}" \
                 | sort | tail -1
-                )
+            )
             if [[ -z "${latest_name}" ]]; then
                 echo "WARN: could not find '${base_pattern}' in '${url_dir}'"
             else
-                echo "Downloading '${url_dir}/${latest_name}' to '${to_dir}'."
-                (cd $to_dir && curl --fail --connect-timeout 10 --progress-bar -k -O ${url_dir}/${latest_name})
-                success=1
-                break
+                echo "Downloading '${latest_dir}/${dir}/${latest_name}' to '${to_dir}'."
+                mget -q -o ${to_dir}/${latest_name} ${latest_dir}/${dir}/${latest_name}
+                if [[ $? == 0 ]]; then
+                    success=1
+                    break
+                fi
             fi
         else
             # Local bits dir 'from_dir' example:
