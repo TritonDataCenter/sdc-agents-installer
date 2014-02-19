@@ -1,6 +1,7 @@
 [
   "agents_core/agents_core",
   "provisioner/provisioner",
+  "zonetracker/zonetracker",
   "heartbeater/heartbeater",
   "hagfish-watcher/hagfish-watcher",
   "smartlogin/smartlogin",
