@@ -3,6 +3,7 @@
   "provisioner/provisioner",
   "zonetracker/zonetracker",
   "heartbeater/heartbeater",
+  "sdc-vm-agent/sdc-vm-agent",
   "hagfish-watcher/hagfish-watcher",
   "smartlogin/smartlogin",
   "ca/cabase",
