@@ -4,6 +4,7 @@
   "zonetracker/zonetracker",
   "heartbeater/heartbeater",
   "vm-agent/vm-agent",
+  "cn-agent/cn-agent",
   "hagfish-watcher/hagfish-watcher",
   "smartlogin/smartlogin",
   "ca/cabase",
