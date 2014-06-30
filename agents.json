@@ -13,5 +13,6 @@
   "amon/amon-agent",
   "amon/amon-relay",
   "marlin/marlin",
-  "firewaller/firewaller"
+  "firewaller/firewaller",
+  "sapi/config-agent"
 ]
