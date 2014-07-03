@@ -4,7 +4,7 @@ set -e
 set -o xtrace
 
 TMP=/var/tmp
-AGENTS="$(ls *.tgz *.tar.gz || /bin/true)"
+AGENTS="$(ls *.tgz *.tar.gz *.tar.bz2 || /bin/true)"
 AGENTS_DIR=/opt/smartdc/agents
 export PATH="$PATH:$AGENTS_DIR/bin"
 
@@ -55,7 +55,7 @@ cleanup-npm-agents() {
   message "Updating existing agents install."
   TOREMOVE="$(agents-npm --no-registry ls installed | awk '{ print $1 }')"
   for agent in "$TOREMOVE"; do
-    if (echo "$agent" | grep '^atropos@'); then 
+    if (echo "$agent" | grep '^atropos@'); then
       continue
     fi
 
