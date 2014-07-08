@@ -97,6 +97,45 @@ install-agents() {
   done
 }
 
+setup_config_agent() {
+    local sapi_url=${CONFIG_sapi_domain}
+    local prefix=AGENTS_DIR/lib/node_modules/config-agent
+    local tmpfile=/tmp/agent.$$.xml
+
+    sed -e "s#@@PREFIX@@#${prefix}#g" \
+        ${prefix}/smf/manifests/config-agent.xml > ${tmpfile}
+    mv ${tmpfile} ${prefix}/smf/manifests/config-agent.xml
+
+    mkdir -p ${prefix}/etc
+    local file=${prefix}/etc/config.json
+    cat >${file} <<EOF
+{
+    "logLevel": "info",
+    "pollInterval": 15000,
+    "sapi": {
+        "url": "${sapi_url}"
+    }
+}
+EOF
+
+  # CONFIG_AGENT_LOCAL_MANIFESTS_DIRS=/opt/smartdc/$role
+  # Caller of setup.common can set 'CONFIG_AGENT_LOCAL_MANIFESTS_DIRS'
+  # to have config-agent use local manifests.
+  # if [[ -n "${CONFIG_AGENT_LOCAL_MANIFESTS_DIRS}" ]]; then
+  #   for dir in ${CONFIG_AGENT_LOCAL_MANIFESTS_DIRS}; do
+  #     local tmpfile=/tmp/add_dir.$$.json
+  #     cat ${file} | json -e "
+  #       this.localManifestDirs = this.localManifestDirs || [];
+  #       this.localManifestDirs.push('$dir');
+  #       " >${tmpfile}
+  #     mv ${tmpfile} ${file}
+  #   done
+  # fi
+
+  svccfg import ${prefix}/smf/manifests/config-agent.xml
+  svcadm enable config-agent
+}
+
 # The 6.5 upgrade agent shar does not contain the agents_core-* tarball
 if [ -z "`ls agents_core-*.tgz 2>/dev/null`" ]; then
     # This is the installer for the 6.5 upgrade agents
@@ -108,5 +147,6 @@ else
 fi
 
 install-agents
+setup_config_agent
 
 exit 0
