@@ -99,7 +99,7 @@ install-agents() {
 
 setup_config_agent() {
     local sapi_url=${CONFIG_sapi_domain}
-    local prefix=AGENTS_DIR/lib/node_modules/config-agent
+    local prefix=$AGENTS_DIR/lib/node_modules/config-agent
     local tmpfile=/tmp/agent.$$.xml
 
     sed -e "s#@@PREFIX@@#${prefix}#g" \
