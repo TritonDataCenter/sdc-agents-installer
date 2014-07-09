@@ -128,8 +128,49 @@ EOF
   #   done
   # fi
 
-  svccfg import ${prefix}/smf/manifests/config-agent.xml
-  svcadm enable config-agent
+  # svccfg import ${prefix}/smf/manifests/config-agent.xml
+  # svcadm enable config-agent
+}
+
+# "sapi_adopt" means adding an agent "instance" record to SAPI's DB
+# $1: service_name
+# $2: instance_uuid
+function sapi_adopt()
+{
+  local service_name=$1
+  local sapi_url=${CONFIG_sapi_domain}
+
+  local service_uuid=""
+  local i=0
+  while [[ -z ${service_uuid} && ${i} -lt 48 ]]; do
+      service_uuid=$(curl ${sapi_url}/services?name=${service_name}\
+          -sS -H accept:application/json | json -Ha uuid)
+      if [[ -z ${service_uuid} ]]; then
+          echo "Unable to get server_uuid from sapi yet.  Sleeping..."
+          sleep 5
+      fi
+      i=$((${i} + 1))
+  done
+  [[ -n ${service_uuid} ]] || \
+      fatal "Unable to get service_uuid for role ${service_name} from SAPI"
+
+  uuid=$2
+
+  i=0
+  while [[ -z ${sapi_instance} && ${i} -lt 48 ]]; do
+      sapi_instance=$(curl ${sapi_url}/instances -sS -X POST \
+          -H content-type:application/json \
+          -d "{ \"service_uuid\" : \"${service_uuid}\", \"uuid\" : \"${uuid}\" }" \
+          | json -H uuid)
+      if [[ -z ${sapi_instance} ]]; then
+          echo "Unable to adopt ${service_name} ${uuid} into sapi yet.  Sleeping..."
+          sleep 5
+      fi
+      i=$((${i} + 1))
+  done
+
+  [[ -n ${sapi_instance} ]] || fatal "Unable to adopt ${uuid} into SAPI"
+  echo "Adopted service ${service_name} to instance ${uuid}"
 }
 
 # The 6.5 upgrade agent shar does not contain the agents_core-* tarball
