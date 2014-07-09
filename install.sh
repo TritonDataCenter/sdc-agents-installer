@@ -10,13 +10,9 @@ export PATH="$PATH:$AGENTS_DIR/bin"
 
 export PATH=$AGENTS_DIR/modules/.npm/agents_core/active/package/local/bin:$PATH
 
-SDC_CONFIG=/lib/sdc/config.sh
-
-if [ -x "$SDC_CONFIG" ]; then
-  source $SDC_CONFIG
-  load_sdc_config
-  load_sdc_sysinfo
-fi
+source /lib/sdc/config.sh
+load_sdc_config
+load_sdc_sysinfo
 
 message() {
   echo "==> $*" >&2
