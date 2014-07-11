@@ -10,6 +10,9 @@ export PATH="$PATH:$AGENTS_DIR/bin"
 
 export PATH=$AGENTS_DIR/modules/.npm/agents_core/active/package/local/bin:$PATH
 
+# These agents are going to be configured by config-agent post-install
+CONFIGURABLE_AGENTS="net-agent vm-agent"
+
 source /lib/sdc/config.sh
 load_sdc_config
 load_sdc_sysinfo
@@ -114,22 +117,27 @@ setup_config_agent() {
 }
 EOF
 
-  # CONFIG_AGENT_LOCAL_MANIFESTS_DIRS=/opt/smartdc/$role
-  # Caller of setup.common can set 'CONFIG_AGENT_LOCAL_MANIFESTS_DIRS'
-  # to have config-agent use local manifests.
-  # if [[ -n "${CONFIG_AGENT_LOCAL_MANIFESTS_DIRS}" ]]; then
-  #   for dir in ${CONFIG_AGENT_LOCAL_MANIFESTS_DIRS}; do
-  #     local tmpfile=/tmp/add_dir.$$.json
-  #     cat ${file} | json -e "
-  #       this.localManifestDirs = this.localManifestDirs || [];
-  #       this.localManifestDirs.push('$dir');
-  #       " >${tmpfile}
-  #     mv ${tmpfile} ${file}
-  #   done
-  # fi
+  for agent in $CONFIGURABLE_AGENTS; do
+    local instance_uuid=$(cat /opt/smartdc/agents/etc/$agent)
+    local tmpfile=/tmp/add_dir.$$.json
 
-  # svccfg import ${prefix}/smf/manifests/config-agent.xml
-  # svcadm enable config-agent
+    if [[ -z ${instance_uuid} ]]; then
+        fatal "Unable to get instance_uuid from /opt/smartdc/agents/etc/$agent"
+    fi
+
+    cat ${file} | json -e "
+      this.instances = this.instances || [];
+      this.instances.push('$instance_uuid');
+      this.localManifestDirs = this.localManifestDirs || {};
+      this.localManifestDirs['$instance_uuid'] = ['$AGENTS_DIR/lib/node_modules/$agent'];
+      " >${tmpfile}
+    mv ${tmpfile} ${file}
+  done
+
+  ${prefix}/build/node/bin/node ${prefix}/agent.js -s -f /opt/smartdc/agents/lib/node_modules/config-agent/etc/config.json
+
+  svccfg import ${prefix}/smf/manifests/config-agent.xml
+  svcadm enable config-agent
 }
 
 # "sapi_adopt" means adding an agent "instance" record to SAPI's DB
@@ -141,9 +149,10 @@ function sapi_adopt()
   local sapi_url=${CONFIG_sapi_domain}
 
   local service_uuid=""
+  local sapi_instance=""
   local i=0
   while [[ -z ${service_uuid} && ${i} -lt 48 ]]; do
-      service_uuid=$(curl ${sapi_url}/services?name=${service_name}\
+      service_uuid=$(curl "${sapi_url}/services?type=agent&name=${service_name}"\
           -sS -H accept:application/json | json -Ha uuid)
       if [[ -z ${service_uuid} ]]; then
           echo "Unable to get server_uuid from sapi yet.  Sleeping..."
@@ -183,7 +192,21 @@ else
     bootstrap
 fi
 
+# For adopting agent instances on SAPI we first generate a UUID and then create
+# an instance with that UUID. The instance UUID should written to a place where
+# it doesn't get removed on upgrades so agents keep their UUIDs. Also, when
+# setting up config-agent we write the instances UUIDs to its config file
+function adopt_agents()
+{
+  for agent in $CONFIGURABLE_AGENTS; do
+    instance_uuid=$(uuid -v4)
+    echo $instance_uuid > $AGENTS_DIR/etc/$agent
+    sapi_adopt $agent $instance_uuid
+  done
+}
+
 install-agents
+adopt_agents
 setup_config_agent
 
 exit 0
