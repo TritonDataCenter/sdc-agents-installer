@@ -194,6 +194,9 @@ __EOF__
 
     (${SHAR} -D -n "Joyent" agents | grep -v '^exit 0'; cat <<EOF
 
+set -o errexit
+set -o pipefail
+
 if [[ -f agents/install.sh ]]; then
     (cd agents && /bin/bash ./install.sh)
 fi
