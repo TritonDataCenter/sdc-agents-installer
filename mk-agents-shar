@@ -162,6 +162,28 @@ function fetch_agent_package() {
     fi
 }
 
+function mk_shar_imgmanifest() {
+    NAME=agentsshar
+    TMPDIR=/tmp
+    GITDESCRIBE=g$(shell git describe --all --long --dirty | $(_AWK) -F'-g' '{print $$NF}')
+    STAMP=${BRANCH}-${TIMESTAMP}-${GITDESCRIBE}
+    RELEASE_FILE=$(shell basename `ls ${TOP}/build/agents-*.sh | head -n 1`)
+
+    RELEASE_MANIFEST=${NAME}.imgmanifest;
+    mkdir -p ${TMPDIR}/${NAME}
+    uuid -v4 > ${TMPDIR}/${NAME}/image_uuid
+    cat $(TOP)/manifest.tmpl | sed \
+            -e "s/UUID/\$$(cat ${TMPDIR}/${NAME}/image_uuid)/" \
+            -e "s/NAME/\$$(json name < ${TOP}/package.json)/" \
+            -e "s/VERSION/1/" \
+            -e "s/BUILDSTAMP/$(STAMP)/" \
+            -e "s/SIZE/\$$(stat --printf="%s" ${TOP}/build/${RELEASE_FILE})/" \
+            -e "s/SHA/\$$(openssl sha1 ${TOP}/build/${RELEASE_FILE} \
+                | cut -d ' ' -f2)/" \
+            > ${BUILD_DIR}/${RELEASE_MANIFEST}
+}
+
+
 function mk_agents_shar() {
     local agents="$1"
     local build_names="$2"
@@ -212,14 +234,19 @@ EOF
     local md5sum_filename=agents-$first_build_name-$TIMESTAMP-$GITDESCRIBE.md5sum
     openssl dgst -md5 $sh_filename | cut -d' ' -f 2 > $md5sum_filename
 
+    mk_shar_imgmanifest
+    local imgmanifest_filename=$(ls $BUILD_DIR/*.imgmanifest | head -n 1)
+
     # Copy bits to output dir, if necessary.
     cd $TOP
     if [[ "$output_dir" != "$BUILD_DIR" ]]; then
         cp $BUILD_DIR/$sh_filename $output_dir/
         cp $BUILD_DIR/$md5sum_filename $output_dir/
+        cp $BUILD_DIR/$imgmanifest_filename $output_dir/
     fi
     echo "Created '$output_dir/$sh_filename'."
     echo "Created '$output_dir/$md5sum_filename'."
+    echo "Created '$output_dir/$imgmanifest_filename'."
 }
 
 
