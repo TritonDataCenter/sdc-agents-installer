@@ -167,7 +167,7 @@ function mk_shar_manifest() {
     TMPDIR=/tmp
     STAMP=${BRANCH}-${TIMESTAMP}-${GITDESCRIBE}
     RELEASE_FILE=$(basename `ls ${TOP}/build/agents-*.sh | head -n 1`)
-    RELEASE_MANIFEST=${NAME}.manifest;
+    RELEASE_MANIFEST=$1
 
     mkdir -p ${TMPDIR}/${NAME}
     uuid -v4 > ${TMPDIR}/${NAME}/image_uuid
@@ -233,8 +233,8 @@ EOF
     local md5sum_filename=agents-$first_build_name-$TIMESTAMP-$GITDESCRIBE.md5sum
     openssl dgst -md5 $sh_filename | cut -d' ' -f 2 > $md5sum_filename
 
-    mk_shar_manifest
-    local manifest_filename=$(ls *.manifest | head -n 1)
+    local manifest_filename=agents-$first_build_name-$TIMESTAMP-$GITDESCRIBE.manifest
+    mk_shar_manifest $manifest_filename
 
     # Copy bits to output dir, if necessary.
     cd $TOP
