@@ -176,8 +176,8 @@ function mk_shar_manifest() {
             -e "s/NAME/$(json name < ${TOP}/package.json)/" \
             -e "s/VERSION/1/" \
             -e "s/BUILDSTAMP/${STAMP}/" \
-            -e "s/SIZE/\$$(stat --printf="%s" ${TOP}/build/${RELEASE_FILE})/" \
-            -e "s/SHA/\$$(openssl sha1 ${TOP}/build/${RELEASE_FILE} \
+            -e "s/SIZE/$(stat --printf="%s" ${TOP}/build/${RELEASE_FILE})/" \
+            -e "s/SHA/$(openssl sha1 ${TOP}/build/${RELEASE_FILE} \
                 | cut -d ' ' -f2)/" \
             > ${RELEASE_MANIFEST}
 }
