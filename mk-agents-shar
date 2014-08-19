@@ -165,9 +165,9 @@ function fetch_agent_package() {
 function mk_shar_imgmanifest() {
     NAME=agentsshar
     TMPDIR=/tmp
-    GITDESCRIBE=g$(shell git describe --all --long --dirty | $(_AWK) -F'-g' '{print $$NF}')
+    GITDESCRIBE=g$(git describe --all --long --dirty | $(_AWK) -F'-g' '{print $$NF}')
     STAMP=${BRANCH}-${TIMESTAMP}-${GITDESCRIBE}
-    RELEASE_FILE=$(shell basename `ls ${TOP}/build/agents-*.sh | head -n 1`)
+    RELEASE_FILE=$(basename `ls ${TOP}/build/agents-*.sh | head -n 1`)
 
     RELEASE_MANIFEST=${NAME}.imgmanifest;
     mkdir -p ${TMPDIR}/${NAME}
