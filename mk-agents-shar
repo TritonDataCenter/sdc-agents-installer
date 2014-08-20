@@ -174,8 +174,7 @@ function mk_shar_manifest() {
     cat ${TOP}/manifest.tmpl | sed \
             -e "s/UUID/$(cat ${TMPDIR}/${NAME}/image_uuid)/" \
             -e "s/NAME/$(json name < ${TOP}/package.json)/" \
-            -e "s/VERSION/1/" \
-            -e "s/BUILDSTAMP/${STAMP}/" \
+            -e "s/BUILDSTAMP/${STAMP}/g" \
             -e "s/SIZE/$(stat --printf="%s" ${TOP}/build/${RELEASE_FILE})/" \
             -e "s/SHA/$(openssl sha1 ${TOP}/build/${RELEASE_FILE} \
                 | cut -d ' ' -f2)/" \
