@@ -70,12 +70,7 @@ fi
 AWK=$((which gawk 2>/dev/null | grep -v "^no ") || which awk)
 GITDESCRIBE=g$(git describe --all --long --dirty | ${AWK} -F'-g' '{print $NF}')
 
-SHAR=${TOP}/shar
-if [[ $(uname -s) == 'Linux' ]]; then
-    SHAR=/usr/bin/shar
-fi
-
-
+SHAR=`which shar`
 
 #---- functions
 
