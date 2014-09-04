@@ -1,7 +1,6 @@
 [
   "agents_core/agents_core",
   "provisioner/provisioner",
-  "zonetracker/zonetracker",
   "heartbeater/heartbeater",
   "cn-agent/cn-agent",
   "net-agent/net-agent",

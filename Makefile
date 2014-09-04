@@ -17,15 +17,6 @@ all: shar
 deps:
 	npm install
 
-# A shar of the "upgrade" agents, i.e. the 6.5 agents used for upgrading
-# on 6.5 CNs during the transition to SDC7.
-upgradeshar: deps
-	./mk-agents-shar -b release-20110901-upgrade \
-		agents-upgrade/provisioner-v2 \
-		agents-upgrade/zonetracker-v2 \
-		agents-upgrade/heartbeater \
-		agents-upgrade/metadata
-
 shar: deps
 	./mk-agents-shar -b $(BUILDNAME)
 
