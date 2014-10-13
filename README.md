@@ -8,17 +8,17 @@
     Copyright (c) 2014, Joyent, Inc.
 -->
 
-# sdc-agents-installer
+# SDC Agents Installer
 
-This repository is part of the Joyent SmartDataCenter project (SDC).  For
-contribution guidelines, issues, and general documentation, visit the main
-[SDC](http://github.com/joyent/sdc) project page.
+This repository is part of the SmartDataCenter (SDC) project. For
+contribution guidelines, issues, and general documentation, visit the
+[main SDC project](http://github.com/joyent/sdc).
 
-sdc-agents-installer automates the process of building a self-extracting
-executable for installing agent services.
+Agents Installer automates the process of building a self-extracting
+executable for installing [agent services](https://github.com/joyent/sdc/blob/master/docs/glossary.md#service).
 
 
-# Agents shar packaging
+## Agents shar Packaging
 
 The main function of the tools in this repo is to produce shell scripts which
 when run will unpack a number of archives for agent services and install
@@ -30,18 +30,11 @@ upgrade agents in SDC.
 
 See the Makefile for typical build targets.
 
-The main 'mk-agents-shar' script presumes a MG-style directory structure
-(https://mo.joyent.com/docs/mg/master/#bits-directory-structure).
+The main 'mk-agents-shar' script presumes a [Mountain Gorilla style directory
+structure](https://github.com/joyent/mountain-gorilla/blob/master/docs/index.md#bits-directory-structure).
 
 
-# Development
-
-    git clone git@github.com:joyent/sdc-agents-installer.git
-    cd sdc-imgapi
-    git submodule update --init
-
-
-# Repository
+## Repository
 
     Makefile
     package.json    npm module info (holds the project version)
@@ -50,3 +43,15 @@ The main 'mk-agents-shar' script presumes a MG-style directory structure
     README.md
     install.sh      file run after installer unpacks all files
     agents.json     mapping of agents/repos/packages
+
+
+## Development
+
+    git clone git@github.com:joyent/sdc-agents-installer.git
+    cd sdc-imgapi
+
+
+## License
+
+SDC Agents Installer is licensed under the
+[Mozilla Public License version 2.0](http://mozilla.org/MPL/2.0/).
