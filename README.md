@@ -45,12 +45,6 @@ structure](https://github.com/joyent/mountain-gorilla/blob/master/docs/index.md#
     agents.json     mapping of agents/repos/packages
 
 
-## Development
-
-    git clone git@github.com:joyent/sdc-agents-installer.git
-    cd sdc-imgapi
-
-
 ## License
 
 SDC Agents Installer is licensed under the
