@@ -214,6 +214,9 @@ function mk_agents_shar() {
 if [ \`pwd\` != '$tmp' ]; then
   cd $tmp
 fi
+
+# Clean up possible previous runs
+rm -fr agents
 __EOF__
 )> $sh_filename
 
