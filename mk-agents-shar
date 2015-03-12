@@ -15,9 +15,8 @@
 # Examples:
 #
 #    # Build name "release-20110714", includes all agents by default.
-#    # Source dir (-d) is a local path or a URL.
-#    bin/mk-agents-shar -b release-20110714 \
-#        -d https://guest:pass@bits.joyent.us/builds
+#    # Source dir (-d) is a local path or Manta path.
+#    bin/mk-agents-shar -b release-20110714 -d /Joyent_Dev/public/builds
 #
 #    # Default build name is "master", default source dir is as above.
 #    bin/mk-agents-shar
@@ -42,7 +41,9 @@ TOP=$(cd $(dirname $0)/; pwd)
 # Put the Manta tools that 'make deps' installed for us first.
 export PATH="${TOP}/node_modules/manta/bin:${PATH}"
 
+
 # --- Manta config
+
 if [[ -z "$MANTA_KEY_ID" ]]; then
     export MANTA_KEY_ID=`ssh-keygen -l -f ~/.ssh/id_rsa.pub | awk '{print $2}' | tr -d '\n'`
 fi
@@ -50,7 +51,7 @@ if [[ -z "$MANTA_USER" ]]; then
     export MANTA_USER="Joyent_Dev";
 fi
 export MANTA_URL=https://us-east.manta.joyent.com
-export MANTA_BASE="/Joyent_Dev/stor/builds"
+export MANTA_BASE="/Joyent_Dev/public/builds"
 
 [[ -n ${MANTA_KEY_ID} ]] || fatal "missing MANTA_KEY_ID"
 [[ -n ${MANTA_USER} ]] || fatal "missing MANTA_USER"
@@ -71,6 +72,8 @@ AWK=$((which gawk 2>/dev/null | grep -v "^no ") || which awk)
 GITDESCRIBE=g$(git describe --all --long --dirty | ${AWK} -F'-g' '{print $NF}')
 
 SHAR=`which shar`
+
+
 
 #---- functions
 
@@ -121,25 +124,27 @@ function fetch_agent_package() {
     for one_build_name in $build_names; do
         local base_pattern="^$(basename $name)-$one_build_name-.*"
 
-        if [[ ! -d ${from_dir} ]]; then      # Not manta
+        if [[ ! -d ${from_dir} ]]; then
             # E.g. "ca/cabase-master-20110728T214412Z-4d6102d.tar.gz"
             local scope=${name%%/*}    # "a/b/c" -> "a"
             local latest_dir=$(mget -q ${from_dir}/${scope}/${one_build_name}-latest)
 
-            [[ -n ${latest_dir} ]] || fatal "Unable to determine latest build of ${name}"
-
-            local latest_name=$(mls ${latest_dir}/${dir} \
-                | grep "${base_pattern}" \
-                | sort | tail -1
-            )
-            if [[ -z "${latest_name}" ]]; then
-                echo "WARN: could not find '${base_pattern}' in '${url_dir}'"
+            if [[ -z ${latest_dir} ]]; then
+                echo "WARN: could not find '${latest_dir}' in Manta"
             else
-                echo "Downloading '${latest_dir}/${dir}/${latest_name}' to '${to_dir}'."
-                mget -q -o ${to_dir}/${latest_name} ${latest_dir}/${dir}/${latest_name}
-                if [[ $? == 0 ]]; then
-                    success=1
-                    break
+                local latest_name=$(mls ${latest_dir}/${dir} \
+                    | grep "${base_pattern}" \
+                    | sort | tail -1
+                )
+                if [[ -z "${latest_name}" ]]; then
+                    echo "WARN: could not find '${base_pattern}' in '${url_dir}'"
+                else
+                    echo "Downloading '${latest_dir}/${dir}/${latest_name}' to '${to_dir}'."
+                    mget -q -o ${to_dir}/${latest_name} ${latest_dir}/${dir}/${latest_name}
+                    if [[ $? == 0 ]]; then
+                        success=1
+                        break
+                    fi
                 fi
             fi
         else
@@ -168,22 +173,25 @@ function fetch_agent_package() {
 }
 
 function mk_shar_manifest() {
-    NAME=agentsshar
-    TMPDIR=/tmp
-    STAMP=${BRANCH}-${TIMESTAMP}-${GITDESCRIBE}
-    RELEASE_FILE=$(basename `ls ${TOP}/build/agents-*.sh | head -n 1`)
-    RELEASE_MANIFEST=$1
+    local first_build_name=$1
+    local release_manifest=$2
 
-    mkdir -p ${TMPDIR}/${NAME}
-    uuid -v4 > ${TMPDIR}/${NAME}/image_uuid
+    local name=agentsshar
+    local stage_dir=/tmp
+    local stamp=${first_build_name}-${TIMESTAMP}-${GITDESCRIBE}
+    local release_file
+    release_file=$(basename `ls ${TOP}/build/agents-*.sh | head -n 1`)
+
+    mkdir -p ${stage_dir}/${name}
+    uuid -v4 > ${stage_dir}/${name}/image_uuid
     cat ${TOP}/manifest.tmpl | sed \
-            -e "s/UUID/$(cat ${TMPDIR}/${NAME}/image_uuid)/" \
+            -e "s/UUID/$(cat ${stage_dir}/${name}/image_uuid)/" \
             -e "s/NAME/$(json name < ${TOP}/package.json)/" \
-            -e "s/BUILDSTAMP/${STAMP}/g" \
-            -e "s/SIZE/$(stat --printf="%s" ${TOP}/build/${RELEASE_FILE})/" \
-            -e "s/SHA/$(openssl sha1 ${TOP}/build/${RELEASE_FILE} \
+            -e "s/BUILDSTAMP/${stamp}/g" \
+            -e "s/SIZE/$(stat --printf="%s" ${TOP}/build/${release_file})/" \
+            -e "s/SHA/$(openssl sha1 ${TOP}/build/${release_file} \
                 | cut -d ' ' -f2)/" \
-            > ${RELEASE_MANIFEST}
+            > ${release_manifest}
 }
 
 
@@ -241,7 +249,7 @@ EOF
     openssl dgst -md5 $sh_filename | cut -d' ' -f 2 > $md5sum_filename
 
     local manifest_filename=agents-$first_build_name-$TIMESTAMP-$GITDESCRIBE.manifest
-    mk_shar_manifest $manifest_filename
+    mk_shar_manifest $first_build_name $manifest_filename
 
     # Copy bits to output dir, if necessary.
     cd $TOP
