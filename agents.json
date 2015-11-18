@@ -1,7 +1,5 @@
 [
   "agents_core/agents_core",
-  "provisioner/provisioner",
-  "heartbeater/heartbeater",
   "cn-agent/cn-agent",
   "net-agent/net-agent",
   "vm-agent/vm-agent",

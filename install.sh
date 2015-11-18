@@ -6,7 +6,7 @@
 #
 
 #
-# Copyright (c) 2014, Joyent, Inc.
+# Copyright (c) 2015, Joyent, Inc.
 #
 
 set -e
@@ -66,13 +66,24 @@ cleanup-npm-agents() {
   rm-agent-dirs
 }
 
+cleanup-apm() {
+    # no_rabbit is now the best rabbit (AGENT-950)
+    message "Removing agents from rabbit era."
+    if [[ -d /opt/smartdc/agents/lib/node_modules/provisioner ]]; then
+        ${AGENTS_DIR}/bin/apm uninstall provisioner
+    fi
+    if [[ -d /opt/smartdc/agents/lib/node_modules/heartbeater ]]; then
+        ${AGENTS_DIR}/bin/apm uninstall heartbeater
+    fi
+}
+
 cleanup-existing() {
   if [ -f "$AGENTS_DIR/bin/agents-npm" ] && agents-npm --no-registry ls atropos | grep 'installed'; then
     cleanup-lime
   elif [ -f "$AGENTS_DIR/bin/agents-npm" ]; then
     cleanup-npm-agents
-  #elif [ -f "$AGENTS_DIR/bin/apm" ]; then
-    # cleanup-apm
+  elif [ -f "$AGENTS_DIR/bin/apm" ]; then
+    cleanup-apm
   fi
 }
 
