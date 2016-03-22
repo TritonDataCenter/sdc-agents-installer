@@ -109,6 +109,10 @@ install-agents() {
   done
 }
 
+restart-cn-agents() {
+  svcadm restart cn-agent
+}
+
 # The 6.5 upgrade agent shar does not contain the agents_core-* tarball
 if [ -z "`ls agents_core-*.tgz 2>/dev/null`" ]; then
     # This is the installer for the 6.5 upgrade agents
@@ -120,5 +124,8 @@ else
 fi
 
 install-agents
+
+# restart cn-agent to force an update of installed agent versions
+restart-cn-agents
 
 exit 0
