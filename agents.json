@@ -1,5 +1,6 @@
 [
   "agents_core/agents_core",
+  "cmon-agent/cmon-agent",
   "cn-agent/cn-agent",
   "net-agent/net-agent",
   "vm-agent/vm-agent",
