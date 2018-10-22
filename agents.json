@@ -6,8 +6,6 @@
   "vm-agent/vm-agent",
   "hagfish-watcher/hagfish-watcher",
   "smartlogin/smartlogin",
-  "ca/cabase",
-  "ca/cainstsvc",
   "amon/amon-agent",
   "amon/amon-relay",
   "marlin/marlin",
