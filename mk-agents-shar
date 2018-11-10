@@ -219,11 +219,11 @@ function mk_agents_shar() {
 
     (cat <<__EOF__
 #!/bin/sh
-if [ \`pwd\` != '$tmp' ]; then
+if [[ \`pwd\` != '$tmp' ]]; then
     cd $tmp
 fi
 
-if [ -n \$UNPACK_SUBDIR ]; then
+if [[ -n \$UNPACK_SUBDIR ]]; then
     mkdir -p \$UNPACK_SUBDIR
     cd \$UNPACK_SUBDIR
 fi
