@@ -6,7 +6,7 @@
 #
 
 #
-# Copyright (c) 2014, Joyent, Inc.
+# Copyright (c) 2018, Joyent, Inc.
 #
 
 #
@@ -219,12 +219,17 @@ function mk_agents_shar() {
 
     (cat <<__EOF__
 #!/bin/sh
-if [ \`pwd\` != '$tmp' ]; then
-  cd $tmp
+
+if [[ -n \$AGENTSSHAR_UNPACK_DIR ]]; then
+    mkdir -p \$AGENTSSHAR_UNPACK_DIR
+    cd \$AGENTSSHAR_UNPACK_DIR
+elif [[ \`pwd\` != '$tmp' ]]; then
+    cd $tmp
 fi
 
 # Clean up possible previous runs
 rm -fr agents
+
 __EOF__
 )> $sh_filename
 
@@ -232,6 +237,10 @@ __EOF__
 
 set -o errexit
 set -o pipefail
+
+if [[ \$AGENTSSHAR_UNPACK_ONLY == "true" ]]; then
+    exit 0
+fi
 
 if [[ -f agents/install.sh ]]; then
     (cd agents && /bin/bash ./install.sh)

@@ -1,7 +1,7 @@
 {
   "name": "agents-installer",
   "description": "Build agentsshar package for SDC",
-  "version": "2.1.0",
+  "version": "2.2.0",
   "author": "Joyent (joyent.com)",
   "private": true,
   "dependencies": {
