@@ -219,17 +219,17 @@ function mk_agents_shar() {
 
     (cat <<__EOF__
 #!/bin/sh
-if [[ \`pwd\` != '$tmp' ]]; then
-    cd $tmp
-fi
 
-if [[ -n \$AGENTSSHAR_UNPACK_SUBDIR ]]; then
-    mkdir -p \$AGENTSSHAR_UNPACK_SUBDIR
-    cd \$AGENTSSHAR_UNPACK_SUBDIR
+if [[ -n \$AGENTSSHAR_UNPACK_DIR ]]; then
+    mkdir -p \$AGENTSSHAR_UNPACK_DIR
+    cd \$AGENTSSHAR_UNPACK_DIR
+elif [[ \`pwd\` != '$tmp' ]]; then
+    cd $tmp
 fi
 
 # Clean up possible previous runs
 rm -fr agents
+
 __EOF__
 )> $sh_filename
 
