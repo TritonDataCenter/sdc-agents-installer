@@ -223,9 +223,9 @@ if [[ \`pwd\` != '$tmp' ]]; then
     cd $tmp
 fi
 
-if [[ -n \$UNPACK_SUBDIR ]]; then
-    mkdir -p \$UNPACK_SUBDIR
-    cd \$UNPACK_SUBDIR
+if [[ -n \$AGENTSSHAR_UNPACK_SUBDIR ]]; then
+    mkdir -p \$AGENTSSHAR_UNPACK_SUBDIR
+    cd \$AGENTSSHAR_UNPACK_SUBDIR
 fi
 
 # Clean up possible previous runs
@@ -238,7 +238,7 @@ __EOF__
 set -o errexit
 set -o pipefail
 
-if [[ \$UNPACK_ONLY == "true" ]]; then
+if [[ \$AGENTSSHAR_UNPACK_ONLY == "true" ]]; then
     exit 0
 fi
 
