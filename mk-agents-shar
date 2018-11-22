@@ -112,7 +112,7 @@ function usage() {
 # package names to be sortable (currently that is acheived by using a
 # ISO timestamp in the package names).
 function fetch_agent_package() {
-    local name=$1         # e.g. "ca/cabase" or "agents/provisioner-v2/provisioner-v2"
+    local name=$1         # e.g. "cn-agent/cn-agent" or "config-agent/config-agent-pkg"
     local build_names=$2  # e.g. "release-20110901" or "master"
                           #     or "feature1 master" to try a feature1 branch
                           #     with master fallback if not available
@@ -125,7 +125,7 @@ function fetch_agent_package() {
         local base_pattern="^$(basename $name)-$one_build_name-.*"
 
         if [[ ! -d ${from_dir} ]]; then
-            # E.g. "ca/cabase-master-20110728T214412Z-4d6102d.tar.gz"
+            # E.g. "cn-agent/cn-agent-master-20181121T204600Z-g1df1666.tgz"
             local scope=${name%%/*}    # "a/b/c" -> "a"
             local latest_dir=$(mget -q ${from_dir}/${scope}/${one_build_name}-latest)
 
@@ -150,8 +150,8 @@ function fetch_agent_package() {
         else
             # Local bits dir 'from_dir' example:
             #   /home/jill/joy/mountain-gorilla/bits
-            # where name='ca/cabase' is at:
-            #   /home/jill/joy/mountain-gorilla/bits/ca/cabase-$branch-*
+            # where name='cn-agent/cn-agent' is at:
+            #   /home/jill/joy/mountain-gorilla/bits/cn-agent/cn-agent-$branch-*
             # where name='agents/metadata/metadata' is at:
             #   /home/jill/joy/mountain-gorilla/bits/agents/metadata/metadata-$branch-*
             local latest_name=$(ls -1 ${from_dir}/${dir}/ | grep "${base_pattern}" | sort | tail -1)
