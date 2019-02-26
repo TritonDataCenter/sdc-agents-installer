@@ -24,6 +24,9 @@
 #    # Using built agent packages from a local "bits" dir.
 #    bin/mk-agents-shar -b release-20110714 -d ../../bits
 #
+#    If $ENGBLD_DEST_OUT_PATH is set in the environment, that will be
+#    used unless a -d option is passed.
+#
 
 if [ "$TRACE" != "" ]; then
     export PS4='${BASH_SOURCE}:${LINENO}: ${FUNCNAME[0]:+${FUNCNAME[0]}(): }'
@@ -38,7 +41,8 @@ set -o pipefail
 
 TOP=$(cd $(dirname $0)/; pwd)
 
-# Put the Manta tools that 'make deps' installed for us first.
+# Put the Manta tools that 'make deps' installed for us first, ensuring
+# we have a compatible version of node.
 export PATH="${TOP}/node_modules/manta/bin:${PATH}"
 
 
@@ -58,7 +62,11 @@ export MANTA_BASE="/Joyent_Dev/public/builds"
 [[ -n ${MANTA_URL} ]] || fatal "missing MANTA_URL"
 [[ -n ${MANTA_BASE} ]] || fatal "missing MANTA_BASE"
 
-DEFAULT_SOURCE_DIR=${MANTA_BASE}
+if [[ -n "$ENGBLD_DEST_OUT_PATH" ]]; then
+	DEFAULT_SOURCE_DIR=${ENGBLD_DEST_OUT_PATH}
+else
+	DEFAULT_SOURCE_DIR=${MANTA_BASE}
+fi
 DEFAULT_BUILD_NAMES=master
 ALL_AGENTS=$(cat agents.json | json -a | xargs)
 
@@ -98,7 +106,7 @@ function usage() {
     echo "          'feature1 master'). Each name is attempted to find an "
     echo "          agent package for each agent."
     echo "  -d      source dir, a local path or URL"
-    echo "          (default is <$DEFAULT_SOURCE_DIR>)"
+    echo "          (default is <$DEFAULT_SOURCE_DIR> (uses \$ENGBLD_DEST_OUT_PATH if set, otherwise $MANTA_BASE)"
     echo "  -o      output directory to which to write results, default is 'build'"
     echo ""
     echo "Build an agents shar. Without any given 'AGENTS' strings all agents"
@@ -121,9 +129,15 @@ function fetch_agent_package() {
     local success=
     local dir=$(dirname $name)
 
+    set +o errexit
     for one_build_name in $build_names; do
         local base_pattern="^$(basename $name)-$one_build_name-.*"
 
+        #
+        # Assume bits are first in "Manta layout" and look for them if
+        # the local directory does not exist. This looks like e.g.
+        # <public/builds>/cn-agent/master-20180822T140522Z-g378f995/cn-agent/cn-agent-master-20180821T140729Z-g792ebd2.tgz
+        #
         if [[ ! -d ${from_dir} ]]; then
             # E.g. "cn-agent/cn-agent-master-20181121T204600Z-g1df1666.tgz"
             local scope=${name%%/*}    # "a/b/c" -> "a"
@@ -148,17 +162,38 @@ function fetch_agent_package() {
                 fi
             fi
         else
+            #
+            # We have two local directory layouts to choose from, for compatibility
+            # reasons:
+            # 1. Mountain gorilla layout:
+            #
             # Local bits dir 'from_dir' example:
             #   /home/jill/joy/mountain-gorilla/bits
             # where name='cn-agent/cn-agent' is at:
             #   /home/jill/joy/mountain-gorilla/bits/cn-agent/cn-agent-$branch-*
             # where name='agents/metadata/metadata' is at:
             #   /home/jill/joy/mountain-gorilla/bits/agents/metadata/metadata-$branch-*
+            #
+            # 2. Manta layout:
+            #    (see above)
+
+            # Try the first layout
             local latest_name=$(ls -1 ${from_dir}/${dir}/ | grep "${base_pattern}" | sort | tail -1)
+            local latest_path="${from_dir}/${dir}/${latest_name}"
+            if [[ -z "${latest_name}" ]]; then
+                # Try the second layout
+                scope=${name%%/*}
+                latest_name=$(ls -H1 ${from_dir}/${scope}/${one_build_name}-latest/${scope} | grep "${base_pattern}" | sort | tail -1)
+                if [[ -n "$latest_name" ]]; then
+                    latest_dir=${from_dir}/${scope}/${one_build_name}-latest/${scope}
+                fi
+                latest_path=${latest_dir}/${latest_name}
+            fi
+
             if [[ -z "${latest_name}" ]]; then
                 echo "WARN: could not find '${base_pattern}' in '${from_dir}/${dir}'"
+                echo "      also tried ${from_dir}/${scope}/${one_build_name}-latest"
             else
-                local latest_path="${from_dir}/${dir}/${latest_name}"
                 echo "Copying '${latest_path}' to '${to_dir}'."
                 cp ${latest_path} ${to_dir}
                 success=1
@@ -166,6 +201,7 @@ function fetch_agent_package() {
             fi
         fi
     done
+    set -o errexit
 
     if [[ -z "$success" ]]; then
         fatal "could not find '$name' agent package with build name '$build_names' in '$from_dir'"

@@ -5,25 +5,36 @@
 #
 
 #
-# Copyright (c) 2014, Joyent, Inc.
+# Copyright (c) 2019, Joyent, Inc.
 #
+
+ENGBLD_REQUIRE := $(shell git submodule update --init deps/eng)
+include ./deps/eng/tools/mk/Makefile.defs
+TOP ?= $(error Unable to access eng.git submodule Makefiles.)
+
+NAME = agentsshar
 
 ifeq ($(BUILDNAME),)
     BUILDNAME=master
 endif
 
+CLEAN_FILES += build/agents
+
 all: shar
 
 deps:
-	npm install
+	PATH=/opt/tools/bin:$(PATH) /opt/tools/bin/npm install
 
 shar: deps
-	./mk-agents-shar -b $(BUILDNAME)
+	PATH=/opt/tools/bin:$(PATH) ./mk-agents-shar -b $(BUILDNAME)
 
-clean:
-	rm -rf build/agents
+publish: shar
+	mkdir -p $(ENGBLD_BITS_DIR)/$(NAME)
+	cp build/agents-*.manifest \
+		build/agents-*.sh \
+		build/agents-*.md5sum \
+		$(ENGBLD_BITS_DIR)/$(NAME)
 
-distclean:
-	rm -rf build
+.PHONY: all shar publish clean distclean deps
 
-.PHONY: all shar clean distclean deps
+include ./deps/eng/tools/mk/Makefile.targ

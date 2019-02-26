@@ -1,5 +1,6 @@
 /*.sh
 /*.md5sum
 /agents
+/bits
 /build
 /node_modules
