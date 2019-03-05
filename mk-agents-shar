@@ -18,9 +18,6 @@
 #    # Source dir (-d) is a local path or Manta path.
 #    bin/mk-agents-shar -b release-20110714 -d /Joyent_Dev/public/builds
 #
-#    # Default build name is "master", default source dir is as above.
-#    bin/mk-agents-shar
-#
 #    # Using built agent packages from a local "bits" dir.
 #    bin/mk-agents-shar -b release-20110714 -d ../../bits
 #
@@ -67,7 +64,6 @@ if [[ -n "$ENGBLD_DEST_OUT_PATH" ]]; then
 else
 	DEFAULT_SOURCE_DIR=${MANTA_BASE}
 fi
-DEFAULT_BUILD_NAMES=master
 ALL_AGENTS=$(cat agents.json | json -a | xargs)
 
 BUILD_DIR=build
@@ -100,7 +96,7 @@ function usage() {
     echo ""
     echo "Options:"
     echo "  -h      print this help and exit"
-    echo "  -b      build name(s), e.g. 'master' (the default), 'release-20110714'"
+    echo "  -b      build name(s), e.g. 'master', 'release-20110714'"
     echo "          Typically the name of the repo branch. Note this can"
     echo "          be multiple space-separated build names (e.g. "
     echo "          'feature1 master'). Each name is attempted to find an "
@@ -313,7 +309,6 @@ EOF
 #---- mainline
 
 # Process arguments.
-build_names=$DEFAULT_BUILD_NAMES
 source_dir=$DEFAULT_SOURCE_DIR
 output_dir=$BUILD_DIR
 while getopts "hb:d:o:" c; do
@@ -338,6 +333,12 @@ while getopts "hb:d:o:" c; do
     esac
 done
 shift $((OPTIND - 1))
+
+if [[ -z "$build_names" ]]; then
+    echo "ERROR: build_names (-b) is required"
+    usage
+    exit 1
+fi
 
 agents="$*"
 if [[ -z "$agents" ]]; then
