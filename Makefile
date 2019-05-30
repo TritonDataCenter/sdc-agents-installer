@@ -5,7 +5,7 @@
 #
 
 #
-# Copyright (c) 2019, Joyent, Inc.
+# Copyright 2019 Joyent, Inc.
 #
 
 ENGBLD_REQUIRE := $(shell git submodule update --init deps/eng)
@@ -16,6 +16,22 @@ NAME = agentsshar
 
 ifeq ($(BUILDNAME),)
     BUILDNAME=$(BRANCH)
+else
+	# Override BRANCH and STAMP so that the filename of the output
+	# shar better describes its contents. The branch and `git describe`
+	# of the sdc-agents-installer repo is computed by the mk-agents-shar
+	# script. We do this here rather than just in mk-agents-shar so that
+	# the directory name used by bits-upload.sh remains correct.
+	#
+	# This results in artifacts of the form:
+	#
+	# agents-<sdc-agents-installer branch>-<buildname separated by '-'><timestamp>-<githash>.manifest
+	# agents-<sdc-agents-installer branch>-<buildname separated by '-'><timestamp>-<githash>.md5sum
+	# agents-<sdc-agents-installer branch>-<buildname separated by '-'>-<timestamp>-<githash>.sh
+	#
+	AGENTS_INSTALLER_BRANCH=$(shell git symbolic-ref HEAD | $(_AWK) -F/ '{print $$3}')
+	BRANCH=$(AGENTS_INSTALLER_BRANCH)-$(shell echo $$BUILDNAME | sed -e 's/ /-/g')
+	STAMP:=$(BRANCH)-$(TIMESTAMP)-$(_GITDESCRIBE)
 endif
 
 CLEAN_FILES += build/agents
