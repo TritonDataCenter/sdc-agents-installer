@@ -33,6 +33,11 @@ See the Makefile for typical build targets.
 The main 'mk-agents-shar' script presumes a [Mountain Gorilla style directory
 structure](https://github.com/joyent/mountain-gorilla/blob/master/docs/index.md#bits-directory-structure).
 
+mk-agents-shar can take a `-b` argument, via `$BUILDNAME` in the Makefile, a
+space-separated hierarchical list of branch names where we should look for
+agents for inclusion in the archive. This way, we can build an agents-shar
+archive containing agents build from development branches. Note that the
+$BUILDNAME branch names form part of the shar archive filename.
 
 ## Repository
 

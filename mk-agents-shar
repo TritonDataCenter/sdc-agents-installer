@@ -6,7 +6,7 @@
 #
 
 #
-# Copyright (c) 2018, Joyent, Inc.
+# Copyright 2019 Joyent, Inc.
 #
 
 #
@@ -74,10 +74,9 @@ fi
 # Need GNU awk for multi-char arg to "-F".
 AWK=$((which gawk 2>/dev/null | grep -v "^no ") || which awk)
 GITDESCRIBE=g$(git describe --all --long --dirty | ${AWK} -F'-g' '{print $NF}')
+SDCINSTALLER_BRANCH=$(git symbolic-ref HEAD | ${AWK} -F/ '{print $3}')
 
 SHAR=`which shar`
-
-
 
 #---- functions
 
@@ -140,7 +139,7 @@ function fetch_agent_package() {
             local latest_dir=$(mget -q ${from_dir}/${scope}/${one_build_name}-latest)
 
             if [[ -z ${latest_dir} ]]; then
-                echo "WARN: could not find '${latest_dir}' in Manta"
+                echo "WARN: could not find '${one_build_name}-latest' in Manta"
             else
                 local latest_name=$(mls ${latest_dir}/${dir} \
                     | grep "${base_pattern}" \
@@ -205,12 +204,11 @@ function fetch_agent_package() {
 }
 
 function mk_shar_manifest() {
-    local first_build_name=$1
-    local release_manifest=$2
+    local release_manifest=$1
 
     local name=agentsshar
     local stage_dir=/tmp
-    local stamp=${first_build_name}-${TIMESTAMP}-${GITDESCRIBE}
+    local stamp=${SDCINSTALLER_BRANCH}-${AGENTS_BRANCH_NAMES}-${TIMESTAMP}-${GITDESCRIBE}
     local release_file
     release_file=$(basename `ls ${TOP}/build/agents-*.sh | head -n 1`)
 
@@ -244,9 +242,8 @@ function mk_agents_shar() {
     done
 
     # Create the shar.
-    local first_build_name=$(echo $build_names | xargs -n1 2>/dev/null | head -1)
     local tmp=/var/tmp
-    local sh_filename=agents-$first_build_name-$TIMESTAMP-$GITDESCRIBE.sh
+    local sh_filename=agents-$SDCINSTALLER_BRANCH-$AGENTS_BRANCH_NAMES-$TIMESTAMP-$GITDESCRIBE.sh
     cd $BUILD_DIR
 
     (cat <<__EOF__
@@ -286,11 +283,11 @@ EOF
 )>> $sh_filename
 
     # Create the md5sums file.
-    local md5sum_filename=agents-$first_build_name-$TIMESTAMP-$GITDESCRIBE.md5sum
+    local md5sum_filename=agents-$SDCINSTALLER_BRANCH-$AGENTS_BRANCH_NAMES-$TIMESTAMP-$GITDESCRIBE.md5sum
     openssl dgst -md5 $sh_filename | cut -d' ' -f 2 > $md5sum_filename
 
-    local manifest_filename=agents-$first_build_name-$TIMESTAMP-$GITDESCRIBE.manifest
-    mk_shar_manifest $first_build_name $manifest_filename
+    local manifest_filename=agents-$SDCINSTALLER_BRANCH-$AGENTS_BRANCH_NAMES-$TIMESTAMP-$GITDESCRIBE.manifest
+    mk_shar_manifest $manifest_filename
 
     # Copy bits to output dir, if necessary.
     cd $TOP
@@ -319,6 +316,7 @@ while getopts "hb:d:o:" c; do
         ;;
     b)
         build_names=$OPTARG
+        AGENTS_BRANCH_NAMES=$(echo $build_names | sed -e 's/ /-/g')
         ;;
     d)
         source_dir=$OPTARG
