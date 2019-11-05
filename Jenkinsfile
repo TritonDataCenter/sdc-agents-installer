@@ -56,7 +56,6 @@ if [[ -z "$JENKINS_RELEASE_BUILD" ]]; then
     echo "Overriding BUILDNAME parameter for $BRANCH_NAME"
     export BUILDNAME=$BRANCH_NAME
 fi
-exit 0
 export ENGBLD_BITS_UPLOAD_IMGAPI=true
 make print-BRANCH print-STAMP all release publish bits-upload''')
             }
