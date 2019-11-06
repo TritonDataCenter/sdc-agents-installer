@@ -13,7 +13,7 @@
 pipeline {
 
     agent {
-        label joyCommonLabels(image_ver: '18.4.0')
+        label joyCommonLabels(image_ver: '15.4.1')
     }
 
     options {
@@ -28,8 +28,10 @@ pipeline {
             description:
                 'The hierarchy of agent branch names to include in the shar ' +
                 'archive. By default, we use the branch of ' +
-                'sdc-agents-installer itself, and fallback to "master" ' +
-                'unless this is a "release-*" branch, when we do not fallback.')
+                'sdc-agents-installer itself, and fallback to "master". ' +
+                'However, if on a "release-*" branch, then the given ' +
+                'BUILDNAME is overridden with "$BRANCH_NAME" to avoid a ' +
+                'fallback branch for release builds.')
     }
 
     stages {
@@ -50,7 +52,10 @@ pipeline {
 set -o errexit
 set -o pipefail
 # If this is a release build, clobber the user-supplied parameter.
-# See MANTA-4675.
+# We always want the release build to use *only* the correct release-branch
+# versions of agents rather than falling back to 'master' (or any other branch)
+# if the release build of a given agent isn't available - in that case,
+# failing the build is better than including the wrong agent component.
 JENKINS_RELEASE_BUILD=$(echo $BRANCH_NAME | sed -e 's/^release-[0-9]*//g')
 if [[ -z "$JENKINS_RELEASE_BUILD" ]]; then
     echo "Overriding BUILDNAME parameter for $BRANCH_NAME"
