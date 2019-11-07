@@ -59,7 +59,7 @@ set -o pipefail
 JENKINS_RELEASE_BUILD=$(echo $BRANCH_NAME | sed -e 's/^release-[0-9]*//g')
 if [[ -z "$JENKINS_RELEASE_BUILD" ]]; then
     echo "Overriding BUILDNAME parameter for $BRANCH_NAME"
-    export BUILDNAME=$BRANCH_NAME
+    export BUILDNAME=""
 fi
 export ENGBLD_BITS_UPLOAD_IMGAPI=true
 make print-BRANCH print-STAMP all release publish bits-upload''')
