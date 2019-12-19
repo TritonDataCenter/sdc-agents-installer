@@ -29,8 +29,17 @@ else
 	# agents-<sdc-agents-installer branch>-<buildname separated by '-'><timestamp>-<githash>.md5sum
 	# agents-<sdc-agents-installer branch>-<buildname separated by '-'>-<timestamp>-<githash>.sh
 	#
+	# The BUILDNAME branches, which indicate the branches of agents to include
+	# in the generated shar archive, are deduped, and in cases where the
+	# sdc-agents-installer branch matches the only unique branch name from
+	# BUILDNAME, we use only the <sdc-agents-installer branch> rather than the
+	# hyphen-separated <sdc-agents-installer branch>-<buildname> value.
+	#
 	AGENTS_INSTALLER_BRANCH=$(shell git symbolic-ref HEAD | $(_AWK) -F/ '{print $$3}')
-	BRANCH=$(AGENTS_INSTALLER_BRANCH)-$(shell echo $$BUILDNAME | sed -e 's/ /-/g')
+	BUNDLED_AGENTS_BRANCHES=$(shell for branch in $$BUILDNAME; do if [[ $$branch == $(AGENTS_INSTALLER_BRANCH) ]]; then continue; fi; echo $$branch; done | sort -u)
+	ifneq ($(BUNDLED_AGENTS_BRANCHES),)
+	    BRANCH=$(AGENTS_INSTALLER_BRANCH)-$(shell echo $(BUNDLED_AGENTS_BRANCHES) | sed -e 's/ /-/g')
+	endif
 	STAMP:=$(BRANCH)-$(TIMESTAMP)-$(_GITDESCRIBE)
 endif
 
