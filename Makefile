@@ -51,7 +51,7 @@ deps:
 	PATH=/opt/tools/bin:$(PATH) /opt/tools/bin/npm install
 
 shar: deps
-	PATH=/opt/tools/bin:$(PATH) ./mk-agents-shar -b "$(BUILDNAME)"
+	PATH=/opt/tools/bin:$(PATH) ./mk-agents-shar -b "$(BUILDNAME)" -B $(BRANCH)
 
 publish: shar
 	mkdir -p $(ENGBLD_BITS_DIR)/$(NAME)

@@ -99,6 +99,7 @@ function usage() {
     echo "          Typically the name of the repo branch. Note this can"
     echo "          be multiple space-separated build names (e.g. "
     echo "          'feature1 master'). Each name is attempted to find an "
+    echo "  -B      branch name to use for the generated shar
     echo "          agent package for each agent."
     echo "  -d      source dir, a local path or URL"
     echo "          (default is <$DEFAULT_SOURCE_DIR> (uses \$ENGBLD_DEST_OUT_PATH if set, otherwise $MANTA_BASE)"
