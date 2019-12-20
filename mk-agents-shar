@@ -208,7 +208,7 @@ function mk_shar_manifest() {
 
     local name=agentsshar
     local stage_dir=/tmp
-    local stamp=${SDCINSTALLER_BRANCH}-${AGENTS_BRANCH_NAMES}-${TIMESTAMP}-${GITDESCRIBE}
+    local stamp=${BRANCH}-${TIMESTAMP}-${GITDESCRIBE}
     local release_file
     release_file=$(basename `ls ${TOP}/build/agents-*.sh | head -n 1`)
 
@@ -243,7 +243,7 @@ function mk_agents_shar() {
 
     # Create the shar.
     local tmp=/var/tmp
-    local sh_filename=agents-$SDCINSTALLER_BRANCH-$AGENTS_BRANCH_NAMES-$TIMESTAMP-$GITDESCRIBE.sh
+    local sh_filename=agents-$BRANCH-$TIMESTAMP-$GITDESCRIBE.sh
     cd $BUILD_DIR
 
     (cat <<__EOF__
@@ -283,10 +283,10 @@ EOF
 )>> $sh_filename
 
     # Create the md5sums file.
-    local md5sum_filename=agents-$SDCINSTALLER_BRANCH-$AGENTS_BRANCH_NAMES-$TIMESTAMP-$GITDESCRIBE.md5sum
+    local md5sum_filename=agents-$BRANCH-$TIMESTAMP-$GITDESCRIBE.md5sum
     openssl dgst -md5 $sh_filename | cut -d' ' -f 2 > $md5sum_filename
 
-    local manifest_filename=agents-$SDCINSTALLER_BRANCH-$AGENTS_BRANCH_NAMES-$TIMESTAMP-$GITDESCRIBE.manifest
+    local manifest_filename=agents-$BRANCH-$TIMESTAMP-$GITDESCRIBE.manifest
     mk_shar_manifest $manifest_filename
 
     # Copy bits to output dir, if necessary.
@@ -308,7 +308,7 @@ EOF
 # Process arguments.
 source_dir=$DEFAULT_SOURCE_DIR
 output_dir=$BUILD_DIR
-while getopts "hb:d:o:" c; do
+while getopts "hb:B:d:o:" c; do
     case "$c" in
     h)
         usage
@@ -316,7 +316,9 @@ while getopts "hb:d:o:" c; do
         ;;
     b)
         build_names=$OPTARG
-        AGENTS_BRANCH_NAMES=$(echo $build_names | sed -e 's/ /-/g')
+        ;;
+    B)
+        BRANCH=$OPTARG
         ;;
     d)
         source_dir=$OPTARG
@@ -334,6 +336,12 @@ shift $((OPTIND - 1))
 
 if [[ -z "$build_names" ]]; then
     echo "ERROR: build_names (-b) is required"
+    usage
+    exit 1
+fi
+
+if [[ -z "$BRANCH" ]]; then
+    echo "ERROR: \$BRANCH should be set in the environment, or passed with -B"
     usage
     exit 1
 fi
