@@ -5,7 +5,7 @@
 #
 
 #
-# Copyright 2019 Joyent, Inc.
+# Copyright 2020 Joyent, Inc.
 #
 
 ENGBLD_REQUIRE := $(shell git submodule update --init deps/eng)
@@ -51,7 +51,7 @@ deps:
 	PATH=/opt/tools/bin:$(PATH) /opt/tools/bin/npm install
 
 shar: deps
-	PATH=/opt/tools/bin:$(PATH) ./mk-agents-shar -b "$(BUILDNAME)"
+	PATH=/opt/tools/bin:$(PATH) ./mk-agents-shar -b "$(BUILDNAME)" -B $(BRANCH)
 
 publish: shar
 	mkdir -p $(ENGBLD_BITS_DIR)/$(NAME)
