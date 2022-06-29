@@ -6,17 +6,17 @@
 
 <!--
     Copyright (c) 2014, Joyent, Inc.
+    Copyright 2022 MNX Cloud, Inc.
 -->
 
 # SDC Agents Installer
 
-This repository is part of the SmartDataCenter (SDC) project. For
+This repository is part of the Triton Data Center project. For
 contribution guidelines, issues, and general documentation, visit the
-[main SDC project](http://github.com/joyent/sdc).
+[main Triton project](http://github.com/TritonDataCenter/triton).
 
 Agents Installer automates the process of building a self-extracting
-executable for installing [agent services](https://github.com/joyent/sdc/blob/master/docs/glossary.md#service).
-
+executable for installing [agent services](https://github.com/TritonDataCenter/triton/blob/master/docs/glossary.md#service).
 
 ## Agents shar Packaging
 
@@ -31,7 +31,7 @@ upgrade agents in SDC.
 See the Makefile for typical build targets.
 
 The main 'mk-agents-shar' script presumes a [Mountain Gorilla style directory
-structure](https://github.com/joyent/mountain-gorilla/blob/master/docs/index.md#bits-directory-structure).
+structure](https://github.com/TritonDataCenter/mountain-gorilla/blob/master/docs/index.md#bits-directory-structure).
 
 mk-agents-shar can take a `-b` argument, via `$BUILDNAME` in the Makefile, a
 space-separated hierarchical list of branch names where we should look for
@@ -48,7 +48,6 @@ $BUILDNAME branch names form part of the shar archive filename.
     README.md
     install.sh      file run after installer unpacks all files
     agents.json     mapping of agents/repos/packages
-
 
 ## License
 

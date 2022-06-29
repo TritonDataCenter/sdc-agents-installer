@@ -7,6 +7,7 @@
 
 #
 # Copyright 2020 Joyent, Inc.
+# Copyright 2022 MNX Cloud, Inc.
 #
 
 #
@@ -46,7 +47,7 @@ export PATH="${TOP}/node_modules/manta/bin:${PATH}"
 # --- Manta config
 
 if [[ -z "$MANTA_KEY_ID" ]]; then
-    export MANTA_KEY_ID=`ssh-keygen -l -f ~/.ssh/id_rsa.pub | awk '{print $2}' | tr -d '\n'`
+    export MANTA_KEY_ID=$(ssh-keygen -l -f ~/.ssh/id_rsa.pub | awk '{print $2}' | tr -d '\n')
 fi
 if [[ -z "$MANTA_USER" ]]; then
     export MANTA_USER="Joyent_Dev";
@@ -72,7 +73,7 @@ if [[ -z "$TIMESTAMP" ]]; then
     TIMESTAMP=$(date -u "+%Y%m%dT%H%M%SZ")
 fi
 # Need GNU awk for multi-char arg to "-F".
-AWK=$((which gawk 2>/dev/null | grep -v "^no ") || which awk)
+AWK=$( (which gawk 2>/dev/null | grep -v "^no ") || which awk)
 GITDESCRIBE=g$(git describe --all --long --dirty | ${AWK} -F'-g' '{print $NF}')
 
 SHAR=`which shar`
@@ -210,7 +211,7 @@ function mk_shar_manifest() {
     local stage_dir=/tmp
     local stamp=${BRANCH}-${TIMESTAMP}-${GITDESCRIBE}
     local release_file
-    release_file=$(basename `ls ${TOP}/build/agents-*.sh | head -n 1`)
+    release_file=$(basename $(ls ${TOP}/build/agents-*.sh | head -n 1))
 
     mkdir -p ${stage_dir}/${name}
     uuid -v4 > ${stage_dir}/${name}/image_uuid
@@ -315,7 +316,10 @@ while getopts "hb:B:d:o:" c; do
         exit 0
         ;;
     b)
-        build_names=$OPTARG
+        # Remove any PRs from build_names. Whatever matching PR found for
+        # various agents will almost certainly not match the build we're making
+        # here and could very well be dangerous.
+        build_names=${OPTARG//PR-* }
         ;;
     B)
         BRANCH=$OPTARG
