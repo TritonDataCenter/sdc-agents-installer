@@ -72,7 +72,7 @@ if [[ -z "$TIMESTAMP" ]]; then
     TIMESTAMP=$(date -u "+%Y%m%dT%H%M%SZ")
 fi
 # Need GNU awk for multi-char arg to "-F".
-AWK=$((which gawk 2>/dev/null | grep -v "^no ") || which awk)
+AWK=$( (which gawk 2>/dev/null | grep -v "^no ") || which awk)
 GITDESCRIBE=g$(git describe --all --long --dirty | ${AWK} -F'-g' '{print $NF}')
 
 SHAR=`which shar`

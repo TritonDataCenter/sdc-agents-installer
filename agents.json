@@ -9,5 +9,6 @@
   "amon/amon-agent",
   "amon/amon-relay",
   "firewaller/firewaller",
+  "firewaller-logger-agent/firewaller-logger-agent",
   "config-agent/config-agent-pkg"
 ]
