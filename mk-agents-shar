@@ -316,12 +316,13 @@ while getopts "hb:B:d:o:" c; do
         exit 0
         ;;
     b)
-        build_names=$OPTARG
+        # Remove any PRs from build_names. Whatever matching PR found for
+        # various agents will almost certainly not match the build we're making
+        # here and could very well be dangerous.
+        build_names=${OPTARG//PR-* }
         ;;
     B)
-        # Use the branch name, unless this is a PR. We don't want to pull in
-        # whatever matching PR build there might be for vaious agents.
-        BRANCH=${OPTARG/#PR-*/master}
+        BRANCH=$OPTARG
         ;;
     d)
         source_dir=$OPTARG

@@ -8,7 +8,7 @@
   "smartlogin/smartlogin",
   "amon/amon-agent",
   "amon/amon-relay",
+  "firewall-logger-agent/firewall-logger-agent",
   "firewaller/firewaller",
-  "firewaller-logger-agent/firewaller-logger-agent",
   "config-agent/config-agent-pkg"
 ]
