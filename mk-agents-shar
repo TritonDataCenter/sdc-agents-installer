@@ -47,7 +47,7 @@ export PATH="${TOP}/node_modules/manta/bin:${PATH}"
 # --- Manta config
 
 if [[ -z "$MANTA_KEY_ID" ]]; then
-    export MANTA_KEY_ID=`ssh-keygen -l -f ~/.ssh/id_rsa.pub | awk '{print $2}' | tr -d '\n'`
+    export MANTA_KEY_ID=$(ssh-keygen -l -f ~/.ssh/id_rsa.pub | awk '{print $2}' | tr -d '\n')
 fi
 if [[ -z "$MANTA_USER" ]]; then
     export MANTA_USER="Joyent_Dev";
@@ -211,7 +211,7 @@ function mk_shar_manifest() {
     local stage_dir=/tmp
     local stamp=${BRANCH}-${TIMESTAMP}-${GITDESCRIBE}
     local release_file
-    release_file=$(basename `ls ${TOP}/build/agents-*.sh | head -n 1`)
+    release_file=$(basename $(ls ${TOP}/build/agents-*.sh | head -n 1))
 
     mkdir -p ${stage_dir}/${name}
     uuid -v4 > ${stage_dir}/${name}/image_uuid
@@ -319,7 +319,9 @@ while getopts "hb:B:d:o:" c; do
         build_names=$OPTARG
         ;;
     B)
-        BRANCH=$OPTARG
+        # Use the branch name, unless this is a PR. We don't want to pull in
+        # whatever matching PR build there might be for vaious agents.
+        BRANCH=${OPTARG/#PR-*/master}
         ;;
     d)
         source_dir=$OPTARG
