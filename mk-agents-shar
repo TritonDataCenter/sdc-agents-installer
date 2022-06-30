@@ -319,7 +319,7 @@ while getopts "hb:B:d:o:" c; do
         # Remove any PRs from build_names. Whatever matching PR found for
         # various agents will almost certainly not match the build we're making
         # here and could very well be dangerous.
-        build_names=${OPTARG//PR-* }
+        build_names=${OPTARG//PR-*/master}
         ;;
     B)
         BRANCH=$OPTARG
