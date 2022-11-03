@@ -218,6 +218,7 @@ function mk_shar_manifest() {
     cat ${TOP}/manifest.tmpl | sed \
             -e "s/UUID/$(cat ${stage_dir}/${name}/image_uuid)/" \
             -e "s/NAME/$(json name < ${TOP}/package.json)/" \
+            -e "s/VERSION/$(json version < ${TOP}/package.json)/" \
             -e "s/BUILDSTAMP/${stamp}/g" \
             -e "s/SIZE/$(stat --printf="%s" ${TOP}/build/${release_file})/" \
             -e "s/SHA/$(openssl sha1 ${TOP}/build/${release_file} \
