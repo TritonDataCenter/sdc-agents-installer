@@ -4,10 +4,5 @@
   "cn-agent/cn-agent",
   "net-agent/net-agent",
   "vm-agent/vm-agent",
-  "hagfish-watcher/hagfish-watcher",
-  "smartlogin/smartlogin",
-  "amon/amon-agent",
-  "amon/amon-relay",
-  "firewaller/firewaller",
   "config-agent/config-agent-pkg"
 ]
