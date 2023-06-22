@@ -7,6 +7,7 @@
 
 #
 # Copyright (c) 2015, Joyent, Inc.
+# Copyright 2023 MNX Cloud, Inc.
 #
 
 set -e
@@ -110,7 +111,11 @@ install-agents() {
 }
 
 restart-cn-agents() {
-  svcadm restart cn-agent
+    if [[ "$(uname)" == "Linux" ]]; then
+        systemctl restart triton-cn-agent
+    else
+        svcadm restart cn-agent
+    fi
 }
 
 # The 6.5 upgrade agent shar does not contain the agents_core-* tarball
