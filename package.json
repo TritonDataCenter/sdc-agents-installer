@@ -1,8 +1,8 @@
 {
   "name": "agents-installer",
-  "description": "Build agentsshar package for SDC",
-  "version": "2.2.0",
-  "author": "Joyent (joyent.com)",
+  "description": "Build agentsshar package for Triton",
+  "version": "2.2.1",
+  "author": "MNX Cloud (mnx.io)",
   "private": true,
   "dependencies": {
     "manta": "5.2.1"
